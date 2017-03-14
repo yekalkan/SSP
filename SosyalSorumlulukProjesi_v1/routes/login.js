@@ -7,4 +7,10 @@ router.get('/', function(req, res, next) {
     res.render('login');
 });
 
+/*
+router.get('/', function(req, res, next) {
+    res.send('Password: ' + req.body.Password);
+});
+*/
+
 module.exports = router;
