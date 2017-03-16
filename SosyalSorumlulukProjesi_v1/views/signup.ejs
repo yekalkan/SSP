@@ -8,7 +8,7 @@
     <meta name="author" content="Dashboard">
     <meta name="keyword" content="Dashboard, Bootstrap, Admin, Template, Theme, Responsive, Fluid, Retina">
 
-    <title>DASHGUM - Bootstrap Admin Template</title>
+    <title>Sign Up!</title>
 
     <!-- Bootstrap core CSS -->
     <link href="stylesheets/bootstrap.css" rel="stylesheet">
@@ -31,30 +31,35 @@
 <!-- **********************************************************************************************************************************************************
 MAIN CONTENT
 *********************************************************************************************************************************************************** -->
+<script language="JavaScript">
+    function chkForm()
+    {
+        if (form1.password.value != form1.password2.value)
+        {
+            alert("Password does not match");
+            form1.password.value = "";
+            form1.password2.value = "";
+            form1.password.focus();
+            return false;
+        }
+    }
+</script>
 
 <div id="login-page">
     <div class="container">
         <!-- action="/users" method="post" -->
-        <form class="form-login" action="/loginprovider" method="post">
-            <h2 class="form-login-heading">sign in now</h2>
+        <form name="form1" class="form-login" action="/adduser" method="post">
+            <h2 class="form-login-heading">sign up now</h2>
             <div class="login-wrap">
-                <input type="text" class="form-control" placeholder="User ID" name="email" autofocus>
+                <input type="text" class="form-control" placeholder="E-Mail" name="email" autofocus>
                 <br>
                 <input type="password" class="form-control" placeholder="Password" name="password">
                 <br>
-                <button class="btn btn-theme btn-block" id="submitbutton"> <i class="fa fa-lock"></i> SIGN IN</button>
+                <input type="password" class="form-control" placeholder="Password" name="password2">
+                <br>
+                <button class="btn btn-theme btn-block" id="submitbutton" onClick="return chkForm()"> <i class="fa fa-lock" ></i> SIGN UP </button>
                 <hr>
-                <div class="registration">
-                    Don't have an account yet?<br/>
-                    <a class="" href="/signup">
-                        Create an account
-                    </a>
-                </div>
-
             </div>
-
-
-
         </form>
 
     </div>
