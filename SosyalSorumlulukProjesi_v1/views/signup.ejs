@@ -6,7 +6,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="">
     <meta name="author" content="Dashboard">
-    <meta name="keyword" content="Dashboard, Bootstrap, Admin, Template, Theme, Responsive, Fluid, Retina">
 
     <title>Sign Up!</title>
 
@@ -32,8 +31,12 @@
 MAIN CONTENT
 *********************************************************************************************************************************************************** -->
 <script language="JavaScript">
-    function chkForm()
+
+    formTemsilci.style.display = "none";
+
+    function chkFormBagisci()
     {
+        form1.usertype.value = "bagisci";
         if (form1.password.value != form1.password2.value)
         {
             alert("Password does not match");
@@ -43,21 +46,42 @@ MAIN CONTENT
             return false;
         }
     }
+
+    function chkFormTemsilci()
+    {
+        form1.usertype.value = "temsilci";
+        if (form1.password.value != form1.password2.value)
+        {
+            alert("Password does not match");
+            form1.password.value = "";
+            form1.password2.value = "";
+            form1.password.focus();
+            return false;
+        }
+    }
+
+
 </script>
+
 
 <div id="login-page">
     <div class="container">
         <!-- action="/users" method="post" -->
-        <form name="form1" class="form-login" action="/adduser" method="post">
-            <h2 class="form-login-heading">sign up now</h2>
+
+
+        <form name="form1" class="form-login" action="/yenikullanici" method="post">
+            <h2 class="form-login-heading"> BİZE KATILIN !</h2>
             <div class="login-wrap">
                 <input type="text" class="form-control" placeholder="E-Mail" name="email" autofocus>
                 <br>
-                <input type="password" class="form-control" placeholder="Password" name="password">
+                <input type="password" class="form-control" placeholder="Şifre" name="password">
                 <br>
-                <input type="password" class="form-control" placeholder="Password" name="password2">
+                <input type="password" class="form-control" placeholder="Tekrardan Şifre" name="password2">
                 <br>
-                <button class="btn btn-theme btn-block" id="submitbutton" onClick="return chkForm()"> <i class="fa fa-lock" ></i> SIGN UP </button>
+
+                <input type="text" style="display: none;"  class="form-control" placeholder=".." name="usertype">
+                <button class="btn btn-theme btn-group" id="submitbutton" onClick="return chkFormBagisci()"> <i class="fa fa-user" ></i> BAĞIŞÇI OLUN </button>
+                <button class="btn btn-theme btn-group" id="submitbutton2" onClick="return chkFormTemsilci()"> <i class="fa fa-university" ></i> TEMSİLCİ OLUN </button>
                 <hr>
             </div>
         </form>
@@ -65,6 +89,20 @@ MAIN CONTENT
     </div>
 </div>
 
+<!--
+   <div class="radio">
+            <label>
+                <input type="radio" name="optionsRadios" id="bagısci" value="bagısci" onclick="return showBagisci()" checked >
+                Bağışçı olmak istiyorum
+            </label>
+        </div>
+        <div class="radio">
+            <label>
+                <input type="radio" name="optionsRadios" id="temsilci" value="temsilci" onclick="return showTemsilci()">
+                Temsilci olmak istiyorum
+            </label>
+        </div>
+-->
 <!-- js placed at the end of the document so the pages load faster -->
 <script src="javascripts/app/jquery.js"></script>
 <script src="javascripts/app/bootstrap.min.js"></script>
@@ -73,7 +111,7 @@ MAIN CONTENT
 <!-- You can use an image of whatever size. This script will stretch to fit in any screen size.-->
 <script type="text/javascript" src="javascripts/app/jquery.backstretch.min.js"></script>
 <script>
-    $.backstretch("images/login-bg.jpg", {speed: 500});
+    $.backstretch("images/img1.jpg", {speed: 500});
 </script>
 
 

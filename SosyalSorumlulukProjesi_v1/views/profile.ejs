@@ -19,7 +19,12 @@
             <h3><i ></i> Hoş Geldiniz!</h3>
             <div class="row mt">
                 <div class="col-lg-12">
-                    <p> <%=username%> </p>
+                    <p> <%=user.name%> </p>
+                    <p> <%=user.birthdate%> </p>
+                    <p> <%=user.address.localaddress%> / <%=user.address.district%> / <%=user.address.city%> </p>
+                    <p> <%=user.phone%> </p>
+                    <p> <%=user.school%> </p>
+
                 </div>
             </div>
 
@@ -60,8 +65,6 @@
         $('select.styled').customSelect();
     });
 
-
-    mainpage.className  = "active";
 
 </script>
 

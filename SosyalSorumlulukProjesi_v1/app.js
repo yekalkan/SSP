@@ -15,6 +15,8 @@ var users = require('./routes/users');
 var login = require('./routes/login');
 var signup = require('./routes/signup');
 var mainpage = require('./routes/mainpage');
+var temsilcibilgileri = require('./routes/temsilcibilgileri');
+var profile= require('./routes/profile');
 
 var app = express();
 
@@ -42,8 +44,8 @@ app.use('/users', users);
 app.use('/login', login);
 app.use('/signup', signup);
 app.use('/mainpage', mainpage);
-
-
+app.use('/temsilcibilgileri', temsilcibilgileri);
+app.use('/profile', profile);
 
 app.post('/loginprovider',function(req,res){
     var e_mail=req.body.email.trim();
@@ -55,9 +57,17 @@ app.post('/loginprovider',function(req,res){
         if (err) throw err;
         console.log(result);
 
-        if(result.length > 0){
-            req.session.username = e_mail;
-            res.redirect('/mainpage');
+        if(result.length > 0) {
+            if (result[0].usertype === "temsilci" && result[0].signupstatus === "infoneeded") {
+                req.session.email = e_mail;
+                req.session.loggedin = true;
+                res.redirect('/temsilcibilgileri');
+            }
+            else {
+                req.session.email = e_mail;
+                req.session.loggedin = true;
+                res.redirect('/mainpage');
+            }
         }
         else{
             res.redirect('/login');
@@ -65,23 +75,67 @@ app.post('/loginprovider',function(req,res){
     });
 });
 
-app.post('/adduSer',function(req,res){
+app.post('/yenikullanici',function(req,res){
     var e_mail=req.body.email.trim();
     var password=req.body.password;
     var password2=req.body.password2;
+    var userType=req.body.usertype;
 
-    if (password != password2 || e_mail === "" || password ===""){
-        res.redirect('/signup');
-    }
 
     var db = req.db;
     var users = db.get('users');
-    users.insert({"email":e_mail,"password":password}, function(err, result) {
+    users.insert({"email":e_mail,"password":password,"usertype":userType, "signupstatus":"infoneeded"}, function(err, result) {
         if (err) throw err;
 
-            req.session.username = e_mail;
-            res.redirect('/mainpage');
+        if(userType === "temsilci"){
+            req.session.email = e_mail;
+            req.session.loggedin = true;
+            req.session.infoneeded = true;
+            res.redirect('/temsilcibilgileri');
+        }
+        else {
+            req.session.email = e_mail;
+            //res.render('bagiscibilgileri');
+        }
+
     });
+});
+
+app.post('/kullanicibilgileri',function(req,res){
+    var e_mail=req.session.email;
+    var userType=req.body.usertype;
+
+    if(userType === "temsilci") {
+        req.session.infoneeded = false;
+        var db = req.db;
+        var users = db.get('users');
+        users.update({"email": e_mail}, {
+            $set: {
+                "signupstatus": "confirmneeded",
+                "school": req.body.school,
+                "name": req.body.name,
+                "birthdate": req.body.birthdate,
+                "address": {
+                    "localaddress": req.body.address,
+                    "district": req.body.district,
+                    "city": req.body.city
+                },
+                "phone": req.body.phone
+            }
+        }, function (err, result) {
+            if (err) throw err;
+
+            res.redirect('/mainpage');
+        });
+    }
+    else{
+        // bağışçı
+    }
+});
+
+app.get('/logout',function(req,res){
+    req.session.destroy();
+     res.redirect('/');
 });
 
 // catch 404 and forward to error handler

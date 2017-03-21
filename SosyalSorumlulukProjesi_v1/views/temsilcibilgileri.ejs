@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="Dashboard">
+
+    <title>Sign Up!</title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="stylesheets/bootstrap.css" rel="stylesheet">
+    <!--external css-->
+    <link href="font-awesome/css/font-awesome.css" rel="stylesheet" />
+
+    <!-- Custom styles for this template -->
+    <link href="stylesheets/style.css" rel="stylesheet">
+    <link href="stylesheets/style-responsive.css" rel="stylesheet">
+
+    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+    <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+    <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+</head>
+
+<body>
+
+<!-- **********************************************************************************************************************************************************
+MAIN CONTENT
+*********************************************************************************************************************************************************** -->
+<script language="JavaScript">
+
+    formTemsilci.style.display = "none";
+
+    function chkForm()
+    {
+        form1.usertype.value = "temsilci";
+
+    }
+
+</script>
+
+
+<div id="login-page">
+    <div class="container">
+        <form name="form1" class="form-panel" action="/kullanicibilgileri" method="post">
+            <h2 class="form-login-heading"> Bilgilerinize İhtiyacımız Var</h2>
+            <div class="login-wrap">
+
+
+                <div class="form-group">
+                    <label class="col-sm-2 col-sm-2 control-label">İsminiz</label>
+                    <div class="col-sm-10">
+                        <input type="text" class="form-control" name="name" style="width: 30%" autofocus><br><br>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-sm-2 col-sm-2 control-label">Doğum Tarihiniz</label>
+                    <div class="col-sm-10">
+                        <input type="date" class="form-control" name="birthdate" style="width: 30%" autofocus><br><br>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-sm-2 col-sm-2 control-label">Adresiniz</label>
+                    <div class="col-sm-10">
+                        <input type="text" class="form-control" placeholder="Sokak/mahalle/kapı" name="address" style="width: 40%">
+                        <input type="text" class="form-control" placeholder="İlçe" name="district" style="width: 20%">
+                        <input type="text" class="form-control" placeholder="Şehir" name="city" style="width: 20%"><br><br>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-sm-2 col-sm-2 control-label">Okulunuz</label>
+                    <div class="col-sm-10">
+                        <input type="text" class="form-control"  name="school" style="width: 30%"><br><br>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-sm-2 col-sm-2 control-label" >Telefon Numaranız</label>
+                    <div class="col-sm-10">
+                        <input type="tel" pattern="[0-9]{10}" class="form-control"  name="phone" style="width: 30%" ><br><br>
+                    </div>
+                </div>
+
+
+                <input type="text" style="display: none;"  class="form-control" placeholder=".." name="usertype">
+                <button class="btn btn-theme btn-block" id="submitbutton" onClick="return chkForm()" style="width: 40%; margin: auto"> <i class="fa fa-user" ></i> Kaydı Gönder </button>
+                <hr>
+            </div>
+        </form>
+
+    </div>
+</div>
+
+<!-- js placed at the end of the document so the pages load faster -->
+<script src="javascripts/app/jquery.js"></script>
+<script src="javascripts/app/bootstrap.min.js"></script>
+
+<!--BACKSTRETCH-->
+<!-- You can use an image of whatever size. This script will stretch to fit in any screen size.-->
+<script type="text/javascript" src="javascripts/app/jquery.backstretch.min.js"></script>
+<script>
+    $.backstretch("images/img1.jpg", {speed: 500});
+</script>
+
+
+</body>
+</html>
