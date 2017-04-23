@@ -134,7 +134,7 @@ header {
 }
 #logo {
 	display:block;
-	background:url(../images/logo.png) 0 0 no-repeat;
+	/*background:url(../images/logo2.png) 0 0 no-repeat;*/
 	width:146px;
 	height:83px;
 	text-indent:-9999px

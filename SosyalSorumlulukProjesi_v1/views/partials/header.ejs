@@ -141,11 +141,88 @@
             </ul>
         </li>
         <!-- inbox dropdown end -->
+
     </ul>
+
     <!--  notification end -->
 </div>
+
+<div class="top-menu">
+    <ul class="nav pull-left top-menu">
+        <li><button class="logout" data-toggle="modal" data-target="#RequestModel" onclick="getItemTypes()" ><i class="fa fa-plus-square" ></i> Yeni İstek Oluştur </button></li>
+    </ul>
+</div>
+
 <div class="top-menu">
     <ul class="nav pull-right top-menu">
         <li><a class="logout" href="/logout">Logout</a></li>
     </ul>
 </div>
+
+<div class="modal fade" id="RequestModel" tabindex="-1" role="dialog" aria-labelledby="RequestModelLabel" aria-hidden="true" data-backdrop="false">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title" id="RequestModelLabel">Yeni Bağış İsteği</h4>
+            </div>
+            <div class="modal-body">
+                <form name="newRequest" action="/yeniBagis" method="post">
+
+                        Tür: <select class="form-control" name="itemType" id="itemTypes" onchange="setItems()">
+                        </select><br>
+
+                        Eşya:
+                        <select  class="form-control" name="item"  id="items1" >
+                        </select><br>
+
+                        <br>
+                        <br>
+                        <input id="requestedCount"  type="number" class="form-control" placeholder="Adet" name="requestedCount" autofocus min="1">
+                        <br>
+                        <button class="btn btn-theme btn-block" id="submitbutton"> <i class="fa fa-plus"></i> Talep Ekle</button>
+
+                </form>
+
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+
+    var itemTypeIndex = 0;
+    var allItems = {};
+
+    function getItemTypes(){
+        $.ajax({
+            type: 'POST',
+            url: '/esyalarigetir',
+            success: function(result) {
+                items = result;
+                allItems = result;
+                var itemsHtml = "";
+                for (var i = 0; i< items.length; i++) {
+                    itemsHtml +=  '<option value:"'+ items[i].itemType + '">';
+                    itemsHtml +=   items[i].itemType + '</option>';
+                }
+                $('#itemTypes').html(itemsHtml);
+                setItems();
+            }
+        });
+    }
+
+    function setItems(){
+        var i = itemTypes.selectedIndex;
+        var itemLists = "";
+        for (var k = 0; k< allItems[i].itemList.length; k++)
+        {
+            itemLists +=  '<option value:"'+ allItems[i].itemList[k] + '">';
+            itemLists +=   allItems[i].itemList[k] + '</option>';
+        }
+        $('#items1').html(itemLists);
+
+    }
+
+</script>

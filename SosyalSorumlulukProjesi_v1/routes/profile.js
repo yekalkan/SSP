@@ -3,6 +3,18 @@ var router = express.Router();
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
+
+    if(req.session.email == undefined){
+        res.redirect('/');
+    }
+    else if(req.session.usertype === "temsilci"){
+        if(req.session.infoneeded){
+            res.redirect('/temsilcibilgileri');
+            return;
+        }
+    }
+
+
     var e_mail=req.session.email;
 
     var db = req.db;

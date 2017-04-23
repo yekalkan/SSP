@@ -6,8 +6,21 @@ router.get('/', function(req, res, next) {
    if(req.session.email == undefined){
        res.redirect('/');
    }
+   else if(req.session.usertype === "temsilci"){
+       if(req.session.infoneeded){
+           res.redirect('/temsilcibilgileri');
+       }
+       else{
+           res.render('mainpage', { username: req.session.email});
+       }
+   }
+   else if(req.session.usertype === "bagisci"){
+       res.render('mainpage', { username: req.session.email});
+   }
+   else if(req.session.usertype === "admin"){
+       res.render('mainpage', { username: req.session.email});
+   }
 
-    res.render('mainpage', { username: req.session.email});
 });
 
 module.exports = router;

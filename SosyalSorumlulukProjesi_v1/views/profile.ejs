@@ -16,7 +16,7 @@
     *********************************************************************************************************************************************************** -->
     <section id="main-content">
         <section class="wrapper site-min-height">
-            <h3><i ></i> Hoş Geldiniz!</h3>
+           <!--
             <div class="row mt">
                 <div class="col-lg-12">
                     <p> <%=user.name%> </p>
@@ -26,6 +26,24 @@
                     <p> <%=user.school%> </p>
 
                 </div>
+            </div>
+            -->
+            <div class="col-lg-5 col-md-12 col-sm-12 mb">
+                <div class="content-panel">
+                    <div id="profile-02">
+                        <div class="user">
+                            <img src="images/img1.jpg" class="img-rounded" width="200">
+                            <h3><%=user.name%></h3>
+                            <h6><%=user.school%></h6>
+                            <h6><%=user.phone%></h6>
+                        </div>
+                    </div>
+                    <div class="pr2-social centered">
+                        <a href="#"><i class="fa fa-twitter"></i></a>
+                        <a href="#"><i class="fa fa-facebook"></i></a>
+                        <a href="#"><i class="fa fa-dribbble"></i></a>
+                    </div>
+                </div><! --/panel -->
             </div>
 
         </section><! --/wrapper -->
@@ -38,7 +56,7 @@
     <!--main content end-->
     <!--footer start-->
     <footer class="site-footer">
-      <% include partials/footer %>>
+      <% include partials/footer %>
     </footer>
     <!--footer end-->
 </section>

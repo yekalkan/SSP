@@ -7,23 +7,20 @@ router.get('/', function(req, res, next) {
         res.redirect('/');
     }
     else if(req.session.usertype === "temsilci"){
-        if(!req.session.infoneeded){
-            res.redirect('/mainpage');
+        if(req.session.infoneeded){
+            res.redirect('/temsilcibilgileri');
         }
         else{
-            res.render('temsilcibilgileri');
+            res.render('bagisistekleri', { username: req.session.email});
         }
     }
     else if(req.session.usertype === "bagisci"){
-        res.redirect('/mainpage');
+        res.render('bagisistekleri', { username: req.session.email});
     }
     else if(req.session.usertype === "admin"){
-        res.redirect('/mainpage');
+        res.render('bagisistekleri', { username: req.session.email});
     }
-    else{
 
-        res.render('temsilcibilgileri');
-    }
 });
 
 module.exports = router;
