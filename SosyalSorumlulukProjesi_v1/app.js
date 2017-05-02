@@ -17,6 +17,7 @@ var mainpage = require('./routes/mainpage');
 var temsilcibilgileri = require('./routes/temsilcibilgileri');
 var profile= require('./routes/profile');
 var kullanicilar = require('./routes/kullanicilar');
+var esyabilgileri = require('./routes/esyabilgileri');
 var bagisistekleri = require('./routes/bagisistekleri');
 
 var app = express();
@@ -48,6 +49,7 @@ app.use('/temsilcibilgileri', temsilcibilgileri);
 app.use('/profile', profile);
 app.use('/kullanicilar', kullanicilar);
 app.use('/bagisistekleri', bagisistekleri);
+app.use('/esyabilgileri', esyabilgileri);
 
 
 
@@ -212,6 +214,32 @@ app.post('/esyalarigetir',function(req,res){
     });
 });
 
+app.post('/yeniesyaekle',function(req,res){
+    var db = req.db;
+    var items = db.get('item');
+    var itemType =req.body.itemType;
+    var item =req.body.item;
+
+    items.update({"itemType": itemType}, {
+        $addToSet: {
+           "itemList": [item]
+        }},function(err, result) {
+        if (err) throw err;
+        res.redirect('/esyabilgileri');
+    });
+});
+
+app.post('/yeniesyaturuekle',function(req,res){
+    var db = req.db;
+    var items = db.get('item');
+    var itemType =req.body.itemType;
+
+    items.insert({"itemType":itemType,"itemList":[]},function(err, result) {
+        if (err) throw err;
+        res.redirect('/esyabilgileri');
+    });
+});
+
 app.post('/bagisisteklerinigetir',function(req,res){
     var db = req.db;
     var donationRequests = db.get('donationRequests');
@@ -238,6 +266,21 @@ app.post('/yeniBagis',function(req,res){
     res.redirect('/mainpage');
 });
 
+app.post('/bagisekle',function(req,res){
+    var reqId=req.body.reqId
+    var donator = req.session.email;
+    var donationCount = req.body.donationCount;
+    console.log("-----------------------------------------------------------------", reqId);
+    var db = req.db;
+    var currentTime = new Date();
+    var donationRequests = db.get('donation');
+    donationRequests.insert({"requestId":reqId,"date":currentTime,"donationStatus":"Aktif", "donator":donator, "donationCount":donationCount, "cargoInfo":""}, function(err, result) {
+        if (err) throw err;
+    });
+
+
+    res.redirect('/profile');
+});
 
 app.get('/logout',function(req,res){
     req.session.destroy();

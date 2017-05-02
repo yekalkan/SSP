@@ -22,6 +22,33 @@
 
             </div>
 
+
+            <div class="modal fade" id="DonationModel" tabindex="-1" role="dialog" aria-labelledby="DonationModelLabel" aria-hidden="true" data-backdrop="false">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                            <h4 class="modal-title" >Yeni Bağış</h4>
+                        </div>
+                        <div id="DonationModelLabel" class="modal-body">
+
+
+                            <form name="newDonationForm" action="/bagisekle" method="post">
+
+                                <br>
+                                <input id="DonationItemCount"  type="number" class="form-control" placeholder="Adet" name="donationCount" autofocus min="1">
+                                <br>
+                                <input type="text" style="display: none;"  class="form-control" placeholder=".." name="reqId">
+                                <button class="btn btn-theme btn-block" id="submitbutton"> <i class="fa fa-plus"></i> Bağışı Bildir</button>
+
+                            </form>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
         </section><! --/wrapper -->
     </section>
     <!-- **********************************************************************************************************************************************************
@@ -54,6 +81,9 @@
 
 <script>
     //custom select box
+        bagislar.className = "active";
+        bagisistekleriSB.className = "active";
+
 
     $(function(){
         $('select.styled').customSelect();
@@ -85,7 +115,7 @@
                     isteklerDivHtml +=  ' </div>';
                     isteklerDivHtml +=  ' </div>';
                     isteklerDivHtml +=  '<div class="row centered">';
-                    isteklerDivHtml +=  '  <img src="images/kalemler.jpg" class="img-rounded" width="120">';
+                    isteklerDivHtml +=  '  <img src="images/bagisistekornek.jpg" class="img-rounded" width="120">';
                     isteklerDivHtml +=  '  </div>';
                     isteklerDivHtml +=  '  <div class="row data">';
                     isteklerDivHtml +=  ' <div class="col-sm-6 col-xs-6 goleft">';
@@ -99,7 +129,16 @@
                     isteklerDivHtml +=  '  <h5>*****</h5>';
                     isteklerDivHtml +=  '  </div>';
                     isteklerDivHtml +=  '</div>';
-                    isteklerDivHtml +=  ' <div class="progress"> <div class="progress-bar progress-bar-success" role="progressbar"';
+
+                    isteklerDivHtml +=  '<div class="col-sm-5 col-xs-6">';
+                    isteklerDivHtml +=  '<button class="btn btn-theme03" data-toggle="modal" data-target="#DonationModel" ' +
+                        ' onclick="bagisIdsiniYerlestir(' +JSON.stringify(result[i]._id).replace(/"/g,"&quot;") + ')"' +
+                        '> <i class="fa fa-heart"></i> Katkı Yap </button>';
+                    isteklerDivHtml +=  '</div>';
+
+                    isteklerDivHtml +=  result[i].donatedCount+'/'+result[i].totalcount;
+                    isteklerDivHtml +=  ' <div class="progress">';
+                    isteklerDivHtml +=   '<div class="progress-bar progress-bar-success" role="progressbar"';
                     isteklerDivHtml +=   'aria-valuenow="'+result[i].donatedCount+'" aria-valuemin="0" aria-valuemax="'+result[i].totalcount+'" style="width: '+proggress+'%"> ' +
                         ''+proggress+'% </div></div>';
                     isteklerDivHtml +=  '  </div>';
@@ -114,9 +153,10 @@
         });
     }
 
+    function bagisIdsiniYerlestir(requestId) {
+        newDonationForm.reqId.value = requestId;
+    }
 
-    mainpage.className  = "active";
-    bagisistekleriSB.className = "active";
 </script>
 
 </body>
