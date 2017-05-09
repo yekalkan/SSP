@@ -34,6 +34,7 @@
                             <tr>
                                 <th><i class="fa fa-bullhorn"></i> Türü </th>
                                 <th class="hidden-phone"><i class="fa fa-question-circle"></i> Eşya </th>
+                                <th class="fa fa-pencil">  Sil</th>
                             </tr>
                             </thead>
                             <tbody></tbody>
@@ -125,6 +126,18 @@
 <!--script for this page-->
 
 <script>
+    function esyayiSil(esyaID){
+        $.ajax({
+            type: 'GET',
+            url: '/esyaSil',
+            data :  {id:esyaID},
+            dataType: "text",
+            success: function(result) {
+
+            }
+        });
+    };
+
     //custom select box
     function getItems(){
         $.ajax({
@@ -136,8 +149,10 @@
                 for (var i = 0; i< items.length; i++) {
                     for (var k = 0; k< items[i].itemList.length; k++) {
                         itemsHtml += '<tr>';
-                        itemsHtml += '<td>' + items[i].itemType + '</td>';
-                        itemsHtml += '<td>' + items[i].itemList[k] + '</td>';
+                        itemsHtml += '<td>' + items[i].itemType + '</td>';      // türü
+                        itemsHtml += '<td>' + items[i].itemList[k] + '</td>';   //adı
+                        //itemsHtml +=   '<td><button class="btn- btn-clear-g" onclick="esyayiSil(' +JSON.stringify( items[i].itemList[k]._id).replace(/"/g,"&quot;") + ')"> Sil </button> </td>';
+
                         itemsHtml += '</tr>';
                     }
                 }

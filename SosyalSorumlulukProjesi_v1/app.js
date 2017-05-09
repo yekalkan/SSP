@@ -19,7 +19,7 @@ var profile= require('./routes/profile');
 var kullanicilar = require('./routes/kullanicilar');
 var esyabilgileri = require('./routes/esyabilgileri');
 var bagisistekleri = require('./routes/bagisistekleri');
-
+var bagiscibilgileri = require('./routes/bagiscibilgileri');
 var app = express();
 
 // view engine setup
@@ -50,7 +50,7 @@ app.use('/profile', profile);
 app.use('/kullanicilar', kullanicilar);
 app.use('/bagisistekleri', bagisistekleri);
 app.use('/esyabilgileri', esyabilgileri);
-
+app.use('/bagiscibilgileri', bagiscibilgileri);
 
 
 
@@ -109,9 +109,12 @@ app.post('/yenikullanici',function(req,res){
         }
         else {
             req.session.email = e_mail;
-            //res.render('bagiscibilgileri');
+            req.session.usertype = userType;
+            req.session.loggedin = true;
+            req.session.infoneeded = true;
+            console.log(userType,"-----------------------");
+            res.redirect('/bagiscibilgileri');
         }
-
     });
 });
 
@@ -146,9 +149,31 @@ app.post('/kullanicibilgileri',function(req,res){
             res.redirect('/mainpage');
         });
     }
-    else{
-        // bağışçı
+    else{ // bagisci
+
+        var db = req.db;
+        var users = db.get('users');
+        users.update({"email": e_mail}, {
+            $set: {
+                "signupstatus": "confirmed",
+                "name": req.body.name,
+                "birthdate": req.body.birthdate,
+                "address": {
+                    "localaddress": req.body.address,
+                    "district": req.body.district,
+                    "city": req.body.city
+                },
+                "phone": req.body.phone
+            }
+        }, function (err, result) {
+            if (err) throw err;
+
+            req.session.infoneeded = false;
+            res.redirect('/mainpage');
+        });
     }
+
+
 });
 
 app.post('/kullanicilistesi',function(req,res){
@@ -203,6 +228,20 @@ app.post('/temsilcionayla',function(req,res){
     });
 });
 
+app.post('/esyaSil',function(req,res){
+    var db = req.db;
+    var users = db.get('item');
+    users.update({"_id": req.body.id}, {
+        $set: {
+            "signupstatus": "confirmed"
+        }
+    }, function (err, result) {
+        if (err) throw err;
+
+        res.send("success");
+    });
+});
+
 app.post('/esyalarigetir',function(req,res){
     var db = req.db;
     var items = db.get('item');
@@ -210,7 +249,7 @@ app.post('/esyalarigetir',function(req,res){
     items.find({},function(err, result) {
         if (err) throw err;
         console.log(result);
-            res.send(result);
+        res.send(result);
     });
 });
 
@@ -222,7 +261,7 @@ app.post('/yeniesyaekle',function(req,res){
 
     items.update({"itemType": itemType}, {
         $addToSet: {
-           "itemList": [item]
+            "itemList": [item]
         }},function(err, result) {
         if (err) throw err;
         res.redirect('/esyabilgileri');
@@ -284,29 +323,25 @@ app.post('/bagisekle',function(req,res){
 
 app.get('/logout',function(req,res){
     req.session.destroy();
-     res.redirect('/');
+    res.redirect('/');
 });
-
-
-
-
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
-  var err = new Error('Not Found');
-  err.status = 404;
-  next(err);
+    var err = new Error('Not Found');
+    err.status = 404;
+    next(err);
 });
 
 // error handler
 app.use(function(err, req, res, next) {
-  // set locals, only providing error in development
-  res.locals.message = err.message;
-  res.locals.error = req.app.get('env') === 'development' ? err : {};
+    // set locals, only providing error in development
+    res.locals.message = err.message;
+    res.locals.error = req.app.get('env') === 'development' ? err : {};
 
-  // render the error page
-  res.status(err.status || 500);
-  res.render('error');
+    // render the error page
+    res.status(err.status || 500);
+    res.render('error');
 });
 
 
