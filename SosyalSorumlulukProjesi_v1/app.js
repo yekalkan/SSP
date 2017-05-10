@@ -316,8 +316,19 @@ app.post('/yeniBagis',function(req,res){
     var db = req.db;
     var currentTime = new Date();
     var donationRequests = db.get('donationRequests');
-    donationRequests.insert({"date":currentTime,"status":"Aktif","user":req.session.email,"itemType":itemType, "item":item,"totalcount":itemCount.toString(), "donatedCount":0}, function(err, result) {
+    var users = db.get('users');
+
+    // donationRequests.insert({"date":currentTime,"status":"Aktif","user":req.session.email,"itemType":itemType, "item":item,"totalcount":itemCount.toString(), "donatedCount":0}, function(err, result) {
+    //     if (err) throw err;
+    // });
+
+    users.find({"email":req.session.email}, function(err, result) {
         if (err) throw err;
+
+        donationRequests.insert({"date":currentTime,"status":"Aktif","user":req.session.email,"itemType":itemType, "address":result[0].address,
+            "item":item,"totalcount":itemCount.toString(), "donatedCount":0, "promisedCount":0}, function(err, result2) {
+            if (err) throw err;
+        });
     });
     res.redirect('/mainpage');
 });
@@ -329,14 +340,70 @@ app.post('/bagisekle',function(req,res){
     console.log("-----------------------------------------------------------------", reqId);
     var db = req.db;
     var currentTime = new Date();
-    var donationRequests = db.get('donation');
-    donationRequests.insert({"requestId":reqId,"date":currentTime,"donationStatus":"Aktif", "donator":donator, "donationCount":donationCount, "cargoInfo":""}, function(err, result) {
+    var donations = db.get('donation');
+    var donationRequests = db.get('donationRequests');
+    var users = db.get('users');
+
+
+    donationRequests.find({"_id":reqId}, function(err, result) {
         if (err) throw err;
+
+        if(result.length > 0) {
+
+            if(result2.length > 0) {
+                donations.insert({"requestId":reqId,"date":currentTime,"donationStatus":"Aktif",
+                    "donator":donator, "donationCount":donationCount, "cargoInfo":""}, function(err, result3) {
+                    if (err) throw err;
+
+                    donationRequests.update({"_id":reqId}, { $set: {
+                        "promisedCount": result[0].promisedCount+donationCount
+                    }}, function(err, result4) {
+                        if (err) throw err;
+
+                        res.redirect('/profile');
+                    });
+                });
+            }
+        }
     });
+
 
 
     res.redirect('/profile');
 });
+
+
+app.post('/kullanicininbagislarinigetir',function(req,res){
+    var db = req.db;
+    var donationRequests = db.get('donationRequests');
+    var donations = db.get('donation');
+
+    donations.find({"donator":req.session.email},function(err, result) {
+        if (err) throw err;
+        var queryString = "{ $or: [ ";
+        for (var i;i<result.length;i++){
+            queryString+= '{"_id": '+ result[i]._id +' }';
+            if(i!=result.length-1){
+                queryString+= ',';
+            }
+        }
+        queryString+= ' ] }';
+
+        donationRequests.find(queryString,function(err, result2) {
+            if (err) throw err;
+            console.log(result);
+
+            var finalResult = {};
+            finalResult.donations = result;
+            finalResult.donationRequests = result2;
+            res.send(finalResult);
+        });
+
+    });
+
+
+});
+
 
 app.get('/logout',function(req,res){
     req.session.destroy();

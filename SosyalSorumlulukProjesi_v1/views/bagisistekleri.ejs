@@ -115,11 +115,9 @@
                     isteklerDivHtml +=  '</div>';
                     isteklerDivHtml +=  ' </div>';
                     isteklerDivHtml +=  ' </div>';
+
                     isteklerDivHtml +=  '<div class="row centered">';
-                    isteklerDivHtml +=  '<form name="donationDetailForm" action="/istekGetir" method="post">'
-                    isteklerDivHtml +=  '<input type="text" class="form-control" placeholder="" value="'+ result[i]._id +'" name="requestID" hidden=true   style="display: none;"  autofocus>'
-                    isteklerDivHtml +=  '<button id="submitIstekGetir" class="btn- btn-info"> Detaylar</button>'
-                    isteklerDivHtml +=  '</form>';
+
                     isteklerDivHtml +=  ' <img src="images/bagisistekornek.jpg" class="img-rounded" width="120"> ';
 
                     isteklerDivHtml +=  '  </div>';
@@ -141,6 +139,10 @@
                         ' onclick="bagisIdsiniYerlestir(' +JSON.stringify(result[i]._id).replace(/"/g,"&quot;") + ')"' +
                         '> <i class="fa fa-heart"></i> Katkı Yap </button>';
                     isteklerDivHtml +=  '</div>';
+                    isteklerDivHtml +=  '<form name="donationDetailForm" action="/istekGetir" method="post">'
+                    isteklerDivHtml +=  '<input type="text" class="form-control" placeholder="" value="'+ result[i]._id +'" name="requestID" hidden=true   style="display: none;"  autofocus>'
+                    isteklerDivHtml +=  '<button id="submitIstekGetir" class="btn- btn-info"> Detaylar</button>'
+                    isteklerDivHtml +=  '</form>';
 
                     isteklerDivHtml +=  result[i].donatedCount+'/'+result[i].totalcount;
                     isteklerDivHtml +=  ' <div class="progress">';
