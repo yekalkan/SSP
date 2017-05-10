@@ -20,6 +20,8 @@ var kullanicilar = require('./routes/kullanicilar');
 var esyabilgileri = require('./routes/esyabilgileri');
 var bagisistekleri = require('./routes/bagisistekleri');
 var bagiscibilgileri = require('./routes/bagiscibilgileri');
+var istek = require('./routes/istek');
+
 var app = express();
 
 // view engine setup
@@ -51,7 +53,7 @@ app.use('/kullanicilar', kullanicilar);
 app.use('/bagisistekleri', bagisistekleri);
 app.use('/esyabilgileri', esyabilgileri);
 app.use('/bagiscibilgileri', bagiscibilgileri);
-
+app.use('/istek', istek);
 
 
 app.post('/loginprovider',function(req,res){
@@ -290,6 +292,21 @@ app.post('/bagisisteklerinigetir',function(req,res){
     });
 });
 
+app.post('/istekGetir',function(req,res){
+
+    var requestID = req.body.requestID;
+
+    var db = req.db;
+    var donationRequests = db.get('donationRequests');
+
+    donationRequests.find({"_id" :requestID},function(err, result) {
+        if (err) throw err;
+
+        console.log(requestID ,"---------------------------------------")
+        res.render('istek', { username: req.session.email, donationDetail : result[0]});
+    });
+});
+
 app.post('/yeniBagis',function(req,res){
     var itemType=req.body.itemType;
     var item=req.body.item;
@@ -306,7 +323,7 @@ app.post('/yeniBagis',function(req,res){
 });
 
 app.post('/bagisekle',function(req,res){
-    var reqId=req.body.reqId
+    var reqId=req.body.reqId;
     var donator = req.session.email;
     var donationCount = req.body.donationCount;
     console.log("-----------------------------------------------------------------", reqId);

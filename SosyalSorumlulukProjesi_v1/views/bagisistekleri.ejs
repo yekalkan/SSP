@@ -49,6 +49,7 @@
             </div>
 
 
+
         </section><! --/wrapper -->
     </section>
     <!-- **********************************************************************************************************************************************************
@@ -115,7 +116,12 @@
                     isteklerDivHtml +=  ' </div>';
                     isteklerDivHtml +=  ' </div>';
                     isteklerDivHtml +=  '<div class="row centered">';
-                    isteklerDivHtml +=  '  <img src="images/bagisistekornek.jpg" class="img-rounded" width="120">';
+                    isteklerDivHtml +=  '<form name="donationDetailForm" action="/istekGetir" method="post">'
+                    isteklerDivHtml +=  '<input type="text" class="form-control" placeholder="" value="'+ result[i]._id +'" name="requestID" hidden=true   style="display: none;"  autofocus>'
+                    isteklerDivHtml +=  '<button id="submitIstekGetir" class="btn- btn-info"> Detaylar</button>'
+                    isteklerDivHtml +=  '</form>';
+                    isteklerDivHtml +=  ' <img src="images/bagisistekornek.jpg" class="img-rounded" width="120"> ';
+
                     isteklerDivHtml +=  '  </div>';
                     isteklerDivHtml +=  '  <div class="row data">';
                     isteklerDivHtml +=  ' <div class="col-sm-6 col-xs-6 goleft">';
@@ -144,6 +150,8 @@
                     isteklerDivHtml +=  '  </div>';
                     isteklerDivHtml +=  '  </div>';
 
+
+
 //'+ (result[i].donatedCount/result[i].totalcount) +'
 
                 }
@@ -156,8 +164,19 @@
     function bagisIdsiniYerlestir(requestId) {
         newDonationForm.reqId.value = requestId;
     }
+//    function istegeGit(requestID){
+//        console.log(requestID, "-------------------------------------------------------------")
+//        $.ajax({
+//              type: 'POST',
+//            url: '/istek1',
+//            data :  {id:requestID},
+//            dataType: "text"
+//
+//        });
+//    };
 
 </script>
+
 
 </body>
 </html>

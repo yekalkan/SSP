@@ -151,7 +151,7 @@
                         itemsHtml += '<tr>';
                         itemsHtml += '<td>' + items[i].itemType + '</td>';      // türü
                         itemsHtml += '<td>' + items[i].itemList[k] + '</td>';   //adı
-                        //itemsHtml +=   '<td><button class="btn- btn-clear-g" onclick="esyayiSil(' +JSON.stringify( items[i].itemList[k]._id).replace(/"/g,"&quot;") + ')"> Sil </button> </td>';
+                        itemsHtml +=   '<td><button class="btn- btn-clear-g" onclick="esyayiSil(' +JSON.stringify( items[i].itemList[k]._id).replace(/"/g,"&quot;") + ')"> Sil </button> </td>';
 
                         itemsHtml += '</tr>';
                     }
