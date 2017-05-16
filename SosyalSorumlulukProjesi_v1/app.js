@@ -230,6 +230,57 @@ app.post('/temsilcionayla',function(req,res){
     });
 });
 
+
+app.post('/yorumEkle',function(req,res){
+    var donationRequestID= req.body.donationRequestID;
+    var comment = req.body.reply;
+    var commentID = req.body.replyID;
+    var secondCommentID = req.body.secondReplyID;
+    console.log(donationRequestID,"---------------------donationRequestID--------------------------------");
+    console.log(comment ,"---------------------comment--------------------------------");
+    console.log(commentID ,"-----------1----------commentID--------------------------------");
+    console.log(secondCommentID ,"-------2-------------commentID--------------------------------");
+    var db = req.db;
+    var donationRequests = db.get('donationRequests');
+    var currentTime = new Date();
+    var maxCommentNumber = 0;
+
+    donationRequests.find({"_id" :donationRequestID},function(err, result) {
+        if (err) throw err;
+
+        console.log(requestID ,"---------------------------------------")
+
+    });
+
+
+    if(secondCommentID==undefined){
+        donationRequests.update({"_id":donationRequestID}, {$push:  {'comments.$.answers':
+            {  "commentID" : 2,
+                "email" : req.session.email,
+                "comment" : comment,
+                "commentDate" : currentTime
+            }}}, function (err, result) {
+            if (err) throw err;
+
+            res.send("success");
+        });
+
+    } else{
+        donationRequests.update({"_id":donationRequestID, "comments.commentID":secondCommentID+1}, {$push:  {'comments.$.answers':
+            {  "commentID" : 1,
+                "email" : req.session.email,
+                "comment" : comment,
+                "commentDate" : currentTime
+            }}}, function (err, result) {
+            if (err) throw err;
+
+            res.send("success");
+        });
+    }
+
+
+});
+
 app.post('/esyaSil',function(req,res){
     var db = req.db;
     var users = db.get('item');
