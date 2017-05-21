@@ -97,7 +97,7 @@
                         <div class="weather-2-header">
                             <div class="row">
                                 <div class="col-sm-6 col-xs-6" style="color:white;">
-                                    <h3><%= JSON.stringify(donationDetail.user) %>
+                                    <h3><%= JSON.stringify(donationDetail.school) %>
                                         için <%= JSON.stringify(donationDetail.totalcount - donationDetail.donatedCount) %>
                                         tane <%= JSON.stringify(donationDetail.item) %> gerekiyor.</h3>
                                 </div>
@@ -149,19 +149,23 @@
                                            class="userlink"><%= donationDetail.comments[i].email %></a> -
                                     <span class="pubdate"><%= donationDetail.comments[i].commentDate %></span>
                                 </header>
-                                <p> <%= donationDetail.comments[i].comment %></p>
+                                <h2> <%= donationDetail.comments[i].comment %></h2>
+                                <% if(donationDetail.comments[i].replies == null){ %>
                                 <button id="<%="replyButton"+i %>" name="replyButton" onclick="openForm()" class="fa-reply">Yanıtla</button>
+                                <%}%>
                                 <form id="<%="replyForm"+i%>" style="display:none;" action="/yorumEkle" method="post">
                                     <textarea name="reply" id="<%="replyTextArea" + i%>" ></textarea>
                                     <input name="donationRequestID"  hidden="true" value="<%=donationDetail._id%>"></input>
                                     <input name="replyID"  hidden="true" value="<%=i%>"></input>
+
                                     <button id="<%="sendReplyButton"+i %>" name="sendReplyButton"   class="fa-reply">Yanıtla</button>
+
                                 </form>
 
                             </div>
 
-                            <% if(donationDetail.comments[i].answers != null){
-                            for(var j = 0; j < donationDetail.comments[i].answers.length; j++) { %>
+                            <% if(donationDetail.comments[i].replies != null){
+                            for(var j = 0; j < donationDetail.comments[i].replies.length; j++) { %>
                             <ul class="replies">
                                 <li class="cmmnt">
                                     <div class="avatar"><a href="javascript:void(0);"><img src="images/pig.png"
@@ -170,52 +174,40 @@
                                     </div>
                                     <div class="cmmnt-content">
                                         <header><a href="javascript:void(0);"
-                                                   class="userlink"><%= donationDetail.comments[i].answers[j].email %></a>
+                                                   class="userlink"><%= donationDetail.comments[i].replies[j].email %></a>
                                             -
-                                            <span class="pubdate"><%= donationDetail.comments[i].answers[j].commentDate %></span>
+                                            <span class="pubdate"><%= donationDetail.comments[i].replies[j].commentDate %></span>
                                         </header>
-                                        <p><%= donationDetail.comments[i].answers[j].comment %></p>
-                                        <button id="<%="replyButton"+i %>" name="replyButton" onclick="openForm()" class="fa-reply">Yanıtla</button>
-                                        <form id="<%="replyForm"+i%>" style="display:none;" action="/yorumEkle" method="post">
-                                            <textarea name="reply" id="<%="replyTextArea" + i%>" ></textarea>
-                                            <input name="donationRequestID"  hidden="true" value="<%=donationDetail._id%>"></input>
-                                            <input name="replyID"  hidden="true" value="<%=i%>"></input>
-                                            <input name="secondReplyID"  hidden="true" value="<%=j%>"></input>
-                                            <button id="<%="sendReplyButton"+i %>" name="sendReplyButton"   class="fa-reply">Yanıtla</button>
-                                        </form>
+                                        <h2><%= donationDetail.comments[i].replies[j].comment %></h2>
+
+
                                     </div>
                                 </li>
                             </ul>
 
-                            <% if(donationDetail.comments[i].answers[j].answers != null){
-                            for(var k = 0; k < donationDetail.comments[i].answers[k].answers.length; k++) { %>
-                            <ul class="replies">
-                                <li class="cmmnt">
-                                    <div class="avatar"><a href="javascript:void(0);"><img src="images/pig.png"
-                                                                                           width="55" height="55"
-                                                                                           alt="Sir_Pig photo avatar"></a>
-                                    </div>
-                                    <div class="cmmnt-content">
-                                        <header><a href="javascript:void(0);"
-                                                   class="userlink"><%= donationDetail.comments[i].answers[j].answers[k].email %></a>
-                                            -
-                                            <span class="pubdate"><%= donationDetail.comments[i].answers[j].answers[k].commentDate %></span>
-                                        </header>
-                                        <p><%= donationDetail.comments[i].answers[j].answers[k].comment %></p>
-                                    </div>
-                                </li>
-                            </ul>
-                            <% }
-                            }
-                            %>
-                            <% }
-                            }
-                            %>
+
+                            <% } %>
+                            <button id="<%="replyToAnswerButton"+i %>" name="replyToAnswerButton" onclick="openForm()" class="fa-reply">Yanıtla</button>
+                            <form id="<%="replyToAnswerForm"+i%>" style="display: none;" action="/yorumEkle" method="post">
+                                <textarea name="replyToAnswer" id="<%="replyToAnswerTextArea" + i%>" ></textarea>
+                                <input name="donationRequestID"  hidden="true" value="<%=donationDetail._id%>"></input>
+                                <input name="replyToAnswerID"  hidden="true" value="<%=i%>"></input>
+                                <input name="secondReplyID"  hidden="true" value="<%=j%>"></input>
+                                <button id="<%="sendReplyButton"+i %>" name="sendReplyButton"   class="fa-reply">Yanıtla</button>
+                            </form>
+                            <% } %>
+
                         </li>
 
                         <% } %>
                     </ul>
                 </div>
+
+                <form id="replyToThreadForm"  action="/konuyaYorumEkle" method="post">
+                    <textarea name="replyToThread" id="replyToThreadTextArea" ></textarea>
+                    <input name="donationRequestIDReply"  hidden="true" value="<%=donationDetail._id%>"></input>
+                    <button id=sendReplyToThreadButton" name="sendReplyToThreadButton"   class="fa-reply">Yorun Ekle</button>
+                </form>
             </div>
 
 
@@ -261,17 +253,12 @@
 <script>
 
        function openForm() {
-//            var form = document.getElementById("commentForm");
-//           var replyForm = document.createElement("form");
-//           replyForm.id="replyForm";
-//           var replyText = document.createElement("textarea");
-//           replyText.id="replyForm";
-//           replyText.setAttribute("name","replyTextArea");
-//            replyForm.appendChild(replyText);
-           $(".fa-reply").click(function() {
 
+           $(".fa-reply").click(function() {
                this.nextElementSibling.style.display="block";
-             //  this.parentNode.appendChild(replyForm);
+//                var replyButtonToNotDisplay = document.getElementById("replyToAnswerButton");
+//                replyButtonToNotDisplay.style.display="none";
+               //  this.parentNode.appendChild(replyForm);
                console.log($(this).parent().attr('id'));
            });
             console.log("hello", "----------------------------------------------");
