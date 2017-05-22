@@ -3,8 +3,78 @@
 <head>
     <% include partials/head %>
 </head>
+<style>
+
+    #w {
+        display: block;
+        width: 700px;
+        margin: 0 auto;
+        padding-top: 35px;
+    }
+
+
+
+    #comments {
+        display: block;
+    }
+
+    #comments .cmmnt, ul .cmmnt, ul ul .cmmnt {
+        display: block;
+        position: relative;
+        padding-left: 65px;
+        border-top: 1px solid #ddd;
+    }
+
+    #comments .cmmnt .avatar {
+        position: absolute;
+        top: 8px;
+        left: 0;
+    }
+
+    #comments .cmmnt .avatar img {
+        -webkit-border-radius: 3px;
+        -moz-border-radius: 3px;
+        border-radius: 3px;
+        -webkit-box-shadow: 1px 1px 2px rgba(0, 0, 0, 0.44);
+        -moz-box-shadow: 1px 1px 2px rgba(0, 0, 0, 0.44);
+        box-shadow: 1px 1px 2px rgba(0, 0, 0, 0.44);
+        -webkit-transition: all 0.4s linear;
+        -moz-transition: all 0.4s linear;
+        -ms-transition: all 0.4s linear;
+        -o-transition: all 0.4s linear;
+        transition: all 0.4s linear;
+    }
+
+    #comments .cmmnt .avatar a:hover img {
+        opacity: 0.77;
+    }
+
+    #comments .cmmnt .cmmnt-content {
+        padding: 0px 3px;
+        padding-bottom: 12px;
+        padding-top: 8px;
+    }
+
+    #comments .cmmnt .cmmnt-content header {
+        font-size: 1.3em;
+        display: block;
+        margin-bottom: 8px;
+    }
+
+    #comments .cmmnt .cmmnt-content header .pubdate {
+        color: #777;
+    }
+
+    #comments .cmmnt .cmmnt-content header .userlink {
+        font-weight: bold;
+    }
+
+    #comments .cmmnt .replies {
+        margin-bottom: 7px;
+    }
+</style>
 <body onload="">
-<section id="container" >
+<section id="container">
     <header class="header black-bg">
         <% include partials/header %>
     </header>
@@ -16,10 +86,10 @@
     *********************************************************************************************************************************************************** -->
     <section id="main-content">
         <section class="wrapper site-min-height">
-            <h2><i ></i> Bağış İstekleri </h2>
+            <h2><i></i> Bağış İstekleri </h2>
 
-            <%var proggress = (donationDetail.donatedCount/donationDetail.totalcount)*((100/donationDetail.totalcount)/(100/donationDetail.totalcount))*100 | 0;
-            console.log(proggress,"-------");
+            <% var proggress = (donationDetail.donatedCount / donationDetail.totalcount) * ((100 / donationDetail.totalcount) / (100 / donationDetail.totalcount)) * 100 | 0;
+            console.log(proggress, "-------");
             %>
             <div class="row mt" id="isteklerDiv">
                 <div class="col-lg-12 col-md-12 col-sm-12 mb">
@@ -27,7 +97,9 @@
                         <div class="weather-2-header">
                             <div class="row">
                                 <div class="col-sm-6 col-xs-6" style="color:white;">
-                                    <h3><%=JSON.stringify(donationDetail.user) %> için <%=JSON.stringify(donationDetail.totalcount-donationDetail.donatedCount)%> tane <%=JSON.stringify(donationDetail.item )%> gerekiyor.</h3>
+                                    <h3><%= JSON.stringify(donationDetail.school) %>
+                                        için <%= JSON.stringify(donationDetail.totalcount - donationDetail.donatedCount) %>
+                                        tane <%= JSON.stringify(donationDetail.item) %> gerekiyor.</h3>
                                 </div>
                                 <div class="col-sm-6 col-xs-6 goright">
 
@@ -39,39 +111,121 @@
                         </div>
                         <div class="row data">
                             <div class="col-sm-6 col-xs-6 goleft">
-                            <h2>Durum: <%=donationDetail.status%></h2>
+                                <h2>Durum: <%= donationDetail.status %></h2>
                             </div>
                             <div class="col-sm-6 col-xs-6 right">
 
-                                <h3><%=donationDetail.donatedCount+'/'+donationDetail.totalcount;%></h3>
+                                <h3><%= donationDetail.donatedCount+'/'+donationDetail.totalcount; %></h3>
                             </div>
                         </div>
 
                         <div class="progress">
-                              <div class="progress-bar progress-bar-success" role="progressbar"  aria-valuenow="<%=donationDetail.donatedCount%>" aria-valuemin="0" aria-valuemax="<%donationDetail.totalcount%>" style="width: '<%=proggress%>%">
-                            <%proggress%>% </div></div>';
+                            <div class="progress-bar progress-bar-success" role="progressbar"
+                                 aria-valuenow="<%= donationDetail.donatedCount %>" aria-valuemin="0"
+                                 aria-valuemax="<% donationDetail.totalcount %>" style="width: '<%= proggress %>%">
+                                <% proggress %>
+                                %
+                            </div>
+                        </div>
+
                     </div>
                 </div>
             </div>
 
 
+            <div id="w">
+                <h1>Yorumlar</h1>
+
+                <div id="container">
+                    <ul id="comments">
+                        <% for(var i = 0; i < donationDetail.comments.length; i++) { %>
+
+                        <li class="cmmnt">
+                            <div class="avatar"><a href="javascript:void(0);">
+                                    <img src="images/dark-cubes.png" width="55" height="55"
+                                         alt="DarkCubes photo avatar"></a></div>
+                            <div class="cmmnt-content" id="<%="comment"+i%>">
+                                <header><a href="javascript:void(0);"
+                                           class="userlink"><%= donationDetail.comments[i].email %></a> -
+                                    <span class="pubdate"><%= donationDetail.comments[i].commentDate %></span>
+                                </header>
+                                <h2> <%= donationDetail.comments[i].comment %></h2>
+                                <% if(donationDetail.comments[i].replies == null){ %>
+                                <button id="<%="replyButton"+i %>" name="replyButton" onclick="openForm()" class="fa-reply">Yanıtla</button>
+                                <%}%>
+                                <form id="<%="replyForm"+i%>" style="display:none;" action="/yorumEkle" method="post">
+                                    <textarea name="reply" id="<%="replyTextArea" + i%>" ></textarea>
+                                    <input name="donationRequestID"  hidden="true" value="<%=donationDetail._id%>"></input>
+                                    <input name="replyID"  hidden="true" value="<%=i%>"></input>
+
+                                    <button id="<%="sendReplyButton"+i %>" name="sendReplyButton"   class="fa-reply">Yanıtla</button>
+
+                                </form>
+
+                            </div>
+
+                            <% if(donationDetail.comments[i].replies != null){
+                            for(var j = 0; j < donationDetail.comments[i].replies.length; j++) { %>
+                            <ul class="replies">
+                                <li class="cmmnt">
+                                    <div class="avatar"><a href="javascript:void(0);"><img src="images/pig.png"
+                                                                                           width="55" height="55"
+                                                                                           alt="Sir_Pig photo avatar"></a>
+                                    </div>
+                                    <div class="cmmnt-content">
+                                        <header><a href="javascript:void(0);"
+                                                   class="userlink"><%= donationDetail.comments[i].replies[j].email %></a>
+                                            -
+                                            <span class="pubdate"><%= donationDetail.comments[i].replies[j].commentDate %></span>
+                                        </header>
+                                        <h2><%= donationDetail.comments[i].replies[j].comment %></h2>
+
+
+                                    </div>
+                                </li>
+                            </ul>
+
+
+                            <% } %>
+                            <button id="<%="replyToAnswerButton"+i %>" name="replyToAnswerButton" onclick="openForm()" class="fa-reply">Yanıtla</button>
+                            <form id="<%="replyToAnswerForm"+i%>" style="display: none;" action="/yorumEkle" method="post">
+                                <textarea name="replyToAnswer" id="<%="replyToAnswerTextArea" + i%>" ></textarea>
+                                <input name="donationRequestID"  hidden="true" value="<%=donationDetail._id%>"></input>
+                                <input name="replyToAnswerID"  hidden="true" value="<%=i%>"></input>
+                                <input name="secondReplyID"  hidden="true" value="<%=j%>"></input>
+                                <button id="<%="sendReplyButton"+i %>" name="sendReplyButton"   class="fa-reply">Yanıtla</button>
+                            </form>
+                            <% } %>
+
+                        </li>
+
+                        <% } %>
+                    </ul>
+                </div>
+
+                <form id="replyToThreadForm"  action="/konuyaYorumEkle" method="post">
+                    <textarea name="replyToThread" id="replyToThreadTextArea" ></textarea>
+                    <input name="donationRequestIDReply"  hidden="true" value="<%=donationDetail._id%>"></input>
+                    <button id=sendReplyToThreadButton" name="sendReplyToThreadButton"   class="fa-reply">Yorun Ekle</button>
+                </form>
+            </div>
 
 
 
-
-        </section><! --/wrapper -->
+        </section>
+        <! --/wrapper -->
     </section>
     <!-- **********************************************************************************************************************************************************
    MAIN CONTENT
    *********************************************************************************************************************************************************** -->
 
-<%console.log(donationDetail,"-------------------------------");%>
-
+    <% console.log(donationDetail, "-------------------------------"); %>
 
     <!--main content end-->
     <!--footer start-->
     <footer class="site-footer">
-      <% include partials/footer %>>
+        <% include partials/footer %>
+        >
     </footer>
     <!--footer end-->
 </section>
@@ -93,9 +247,29 @@
 
 <script>
     //custom select box
-        bagislar.className = "active";
-        bagisistekleriSB.className = "active";
-        </script>
+    bagislar.className = "active";
+    bagisistekleriSB.className = "active";
+</script>
+<script>
+
+       function openForm() {
+
+           $(".fa-reply").click(function() {
+               this.nextElementSibling.style.display="block";
+//                var replyButtonToNotDisplay = document.getElementById("replyToAnswerButton");
+//                replyButtonToNotDisplay.style.display="none";
+               //  this.parentNode.appendChild(replyForm);
+               console.log($(this).parent().attr('id'));
+           });
+            console.log("hello", "----------------------------------------------");
+
+    };
+
+
+
+
+</script>
+
 
 
 </body>
