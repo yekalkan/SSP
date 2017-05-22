@@ -233,12 +233,50 @@ app.post('/temsilcionayla', function (req, res) {
     });
 });
 
+app.post('/cevapEkle', function (req, res) {
+    var donationRequestID = req.body.donationRequestID;
+    var comment = req.body.firstReply;
+    var commentID = req.body.firstReplyID;
+
+
+    console.log(donationRequestID, "---------------------donationRequestID--------------------------------");
+    console.log(comment, "---------------------comment--------------------------------");
+    console.log(commentID, "-----------1----------commentID--------------------------------");
+    var db = req.db;
+    var donationRequests = db.get('donationRequests');
+    var currentTime = new Date();
+
+
+    donationRequests.update({"_id": donationRequestID, "comments.commentID": commentID}, {
+        $push: {
+            'comments.$.replies': {
+                "replyID": "0",
+                "email": req.session.email,
+                "comment": comment,
+                "commentDate": currentTime
+            }
+        }
+    }, {"upsert": true}, function (err, result) {
+        if (err) throw err;
+
+        donationRequests.find({"_id": donationRequestID}, function (err, result2) {
+            if (err) throw err;
+            res.render('istek', {username: req.session.email, donationDetail: result2[0]});
+        });
+
+
+    });
+
+
+});
+
 
 app.post('/yorumEkle', function (req, res) {
     var donationRequestID = req.body.donationRequestID;
     var comment = req.body.replyToAnswer;
     var commentID = req.body.replyToAnswerID;
     var secondCommentID = req.body.secondReplyID;
+
     console.log(donationRequestID, "---------------------donationRequestID--------------------------------");
     console.log(comment, "---------------------comment--------------------------------");
     console.log(commentID, "-----------1----------commentID--------------------------------");
@@ -248,30 +286,33 @@ app.post('/yorumEkle', function (req, res) {
     var currentTime = new Date();
     var maxCommentNumber = 0;
 
-
-    secondCommentID = secondCommentID + 1;
+    if (typeof query !== secondCommentID && query) {
+        secondCommentID = 0;
+        console.log("yoruma ilk cevap", "----------------");
+    }
 
 
     donationRequests.update({"_id": donationRequestID, "comments.commentID": commentID}, {
         $push: {
             'comments.$.replies': {
-                "replyID": secondCommentID,
-                "email": "deneme",
+                "replyID": secondCommentID.toString(),
+                "email": req.session.email,
                 "comment": comment,
                 "commentDate": currentTime
             }
         }
-    }, function (err, result) {
+    }, {"upsert": true}, function (err, result) {
         if (err) throw err;
-        console.log(result, "-------2-------------query result--------------------------------");
-
-        res.send("success");
+        donationRequests.find({"_id": donationRequestID}, function (err, result2) {
+            if (err) throw err;
+            res.render('istek', {username: req.session.email, donationDetail: result2[0]});
+        });
     });
 
 
 });
 
-app.post('/konuyaYorumEkle', function (req, res) {
+app.post('/konuyaYorumEkle', function (req, res, next) {
     var donationRequestID = req.body.donationRequestIDReply;
     var comment = req.body.replyToThread;
 
@@ -281,30 +322,36 @@ app.post('/konuyaYorumEkle', function (req, res) {
     var db = req.db;
     var donationRequests = db.get('donationRequests');
     var currentTime = new Date();
-
+    var newCommentID;
 
     donationRequests.find({"_id": donationRequestID}, function (err, result) {
         if (err) throw err;
 
-        console.log(result[0], "---------------------------------------")
-        console.log(result[0].comments.toArray().length(), "---------------------------------------")
+        console.log(result[0], "---------------------------------------");
+        newCommentID = Object.keys(result[0].comments).length;
+        console.log(newCommentID, "-------------------comment count------------------");
 
-    });
-
-    donationRequests.update({"_id": donationRequestID}, {
-        $push: {
-            'comments': {
-                "commentID": 2,
-                "email": req.session.email,
-                "comment": comment,
-                "commentDate": currentTime
+        donationRequests.update({"_id": donationRequestID}, {
+            $push: {
+                'comments': {
+                    "commentID": newCommentID.toString(),
+                    "email": req.session.email,
+                    "comment": comment,
+                    "commentDate": currentTime
+                }
             }
-        }
-    }, function (err, result) {
-        if (err) throw err;
+        }, function (err, result2) {
+            if (err) throw err;
 
-        res.send("success");
+            donationRequests.find({"_id": donationRequestID}, function (err, result3) {
+                if (err) throw err;
+                res.render('istek', {username: req.session.email, donationDetail: result3[0]});
+            });
+
+        });
+
     });
+
 
 });
 
@@ -499,6 +546,15 @@ app.post('/kullanicininbagislarinigetir', function (req, res) {
 app.get('/logout', function (req, res) {
     req.session.destroy();
     res.redirect('/');
+});
+
+app.get('/wsUser', function (req, res) {
+    var db = req.db;
+    var users = db.get('users');
+    users.find({}, function (err, result) {
+        if (err) throw err;
+        res.json(result);
+    });
 });
 
 // catch 404 and forward to error handler

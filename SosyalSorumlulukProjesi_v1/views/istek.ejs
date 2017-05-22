@@ -149,14 +149,14 @@
                                            class="userlink"><%= donationDetail.comments[i].email %></a> -
                                     <span class="pubdate"><%= donationDetail.comments[i].commentDate %></span>
                                 </header>
-                                <h2> <%= donationDetail.comments[i].comment %></h2>
+                                <h5> <%= donationDetail.comments[i].comment %></h5>
                                 <% if(donationDetail.comments[i].replies == null){ %>
-                                <button id="<%="replyButton"+i %>" name="replyButton" onclick="openForm()" class="fa-reply">Yanıtla</button>
+                                <button id="<%="replyButton"+i %>" name="replyButton" onclick="openForm(<%="replyButton"+i %>)" class="fa-reply">Yanıtla</button>
                                 <%}%>
-                                <form id="<%="replyForm"+i%>" style="display:none;" action="/yorumEkle" method="post">
-                                    <textarea name="reply" id="<%="replyTextArea" + i%>" ></textarea>
+                                <form id="<%="replyForm"+i%>" style="display:none;" action="/cevapEkle" method="post">
+                                    <textarea name="firstReply" id="<%="replyTextArea" + i%>" ></textarea>
                                     <input name="donationRequestID"  hidden="true" value="<%=donationDetail._id%>"></input>
-                                    <input name="replyID"  hidden="true" value="<%=i%>"></input>
+                                    <input name="firstReplyID"  hidden="true" value="<%=i%>"></input>
 
                                     <button id="<%="sendReplyButton"+i %>" name="sendReplyButton"   class="fa-reply">Yanıtla</button>
 
@@ -178,7 +178,7 @@
                                             -
                                             <span class="pubdate"><%= donationDetail.comments[i].replies[j].commentDate %></span>
                                         </header>
-                                        <h2><%= donationDetail.comments[i].replies[j].comment %></h2>
+                                        <h5><%= donationDetail.comments[i].replies[j].comment %></h5>
 
 
                                     </div>
@@ -187,7 +187,7 @@
 
 
                             <% } %>
-                            <button id="<%="replyToAnswerButton"+i %>" name="replyToAnswerButton" onclick="openForm()" class="fa-reply">Yanıtla</button>
+                            <button id="<%="replyToAnswerButton"+i %>" name="replyToAnswerButton" onclick="openForm(<%="replyToAnswerButton"+i %>)" class="fa-reply">Yanıtla</button>
                             <form id="<%="replyToAnswerForm"+i%>" style="display: none;" action="/yorumEkle" method="post">
                                 <textarea name="replyToAnswer" id="<%="replyToAnswerTextArea" + i%>" ></textarea>
                                 <input name="donationRequestID"  hidden="true" value="<%=donationDetail._id%>"></input>
@@ -252,10 +252,11 @@
 </script>
 <script>
 
-       function openForm() {
+       function openForm(id) {
 
            $(".fa-reply").click(function() {
                this.nextElementSibling.style.display="block";
+               document.getElementById(id).style.display="none";
 //                var replyButtonToNotDisplay = document.getElementById("replyToAnswerButton");
 //                replyButtonToNotDisplay.style.display="none";
                //  this.parentNode.appendChild(replyForm);
@@ -263,8 +264,7 @@
            });
             console.log("hello", "----------------------------------------------");
 
-    };
-
+    }
 
 
 
