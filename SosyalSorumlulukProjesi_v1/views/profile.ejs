@@ -3,7 +3,7 @@
 <head>
     <% include partials/head %>
 </head>
-<body>
+<body onload="getDonations('<%=username%>')">
 <section id="container" >
     <header class="header black-bg">
         <% include partials/header %>
@@ -46,6 +46,38 @@
                 </div><! --/panel -->
             </div>
 
+            <div class="row mt" id="isteklerDiv">
+
+            </div>
+
+
+            <div class="modal fade" id="KargoModel" tabindex="-1" role="dialog" aria-labelledby="KargoModelLabel" aria-hidden="true" data-backdrop="false">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                            <h4 class="modal-title" >Kargo Bilgileri</h4>
+                        </div>
+                        <div id="KargoModelLabel" class="modal-body">
+
+
+                            <form name="KargoForm" action="/kargobilgisiekle" method="post">
+
+                                <br>
+                                <input  type="text" class="form-control" placeholder="kargo firması" name="cargoCompany" autofocus>
+                                <br>
+                                <input type="number" class="form-control" placeholder="takip numarası" name="trackingNo" autofocus>
+                                <br>
+                                <input type="text" style="display: none;"  class="form-control" placeholder=".." name="bagisId">
+                                <button class="btn btn-theme btn-block" id="submitbutton"> <i class="fa fa-plus"></i> Ekle</button>
+
+                            </form>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+
         </section><! --/wrapper -->
     </section>
     <!-- **********************************************************************************************************************************************************
@@ -82,6 +114,101 @@
     $(function(){
         $('select.styled').customSelect();
     });
+
+    function getDonations(email){
+        $.ajax({
+            type: 'POST',
+            data :  {useremail:email},
+            url: '/kullanicininbagislarinigetir',
+            success: function(result) {
+                var i;
+                console.log(result.length);
+                console.log(result);
+                var isteklerDivHtml = '';
+                for (i = 0; i< result.length; i++) {
+
+
+                    isteklerDivHtml +=  '<div class="col-lg-4 col-md-4 col-sm-4 mb">';
+                    isteklerDivHtml +=  ' <div class="weather-2 pn">';
+                    isteklerDivHtml +=  ' <div class="weather-2-header">';
+                    isteklerDivHtml +=  '  <div class="row">';
+                    isteklerDivHtml +=  '  <div class="col-sm-6 col-xs-6">';
+                    isteklerDivHtml +=  ' <p>'+result[i].donationRequest.address.district + ',&nbsp'+ result[i].donationRequest.address.city+'</p>';
+                    isteklerDivHtml +=  ' </div>';
+                    isteklerDivHtml +=  '<div class="col-sm-6 col-xs-6 goright">';
+                    isteklerDivHtml +=  '  <p class="small">'+ (result.length-1) +result[i].date+'</p>';
+                    isteklerDivHtml +=  '</div>';
+                    isteklerDivHtml +=  ' </div>';
+                    isteklerDivHtml +=  ' </div>';
+
+                    isteklerDivHtml +=  '<div class="row centered">';
+
+                    isteklerDivHtml +=  ' <img src="images/bagisistekornek.jpg" class="img-rounded" width="120"> ';
+
+                    isteklerDivHtml +=  '  </div>';
+                    isteklerDivHtml +=  '  <div class="row data">';
+                    isteklerDivHtml +=  ' <div class="col-sm-6 col-xs-6 goleft">';
+                    if(result[i].donationStatus == "Aktif"){
+                        isteklerDivHtml +=  ' <h6><b>'+result[i].donationCount+ '&nbspadet&nbsp' + result[i].donationRequest.item + '&nbspbağışlanacak'+'</b></h6>';
+
+                    }
+                    else if(result[i].donationStatus == "Tamamlandı"){
+                        isteklerDivHtml +=  ' <h6><b>'+result[i].donationCount+ '&nbspadet&nbsp' + result[i].donationRequest.item + '&nbspbağışlandı'+'</b></h6>';
+                    }
+                    else{
+                        isteklerDivHtml +=  ' <h6><b>'+result[i].donationCount+ '&nbspadet&nbsp' + result[i].donationRequest.item + '&nbspbağışlanamadı (iptal)'+'</b></h6>';
+                    }
+                    isteklerDivHtml +=  ' <h6> **</h6>';
+                    isteklerDivHtml +=  ' <h6>********</h6>';
+                    isteklerDivHtml +=  '</div>';
+                    isteklerDivHtml +=  ' <div class="col-sm-6 col-xs-6 goright">';
+                    isteklerDivHtml +=  '  <h5><i class="fa fa-angle-down"></i></h5>';
+                    isteklerDivHtml +=  '  <h6><b>***</b></h6>';
+                    isteklerDivHtml +=  '  <h5>*****</h5>';
+                    isteklerDivHtml +=  '  </div>';
+                    isteklerDivHtml +=  '</div>';
+
+                    if(result[i].donationStatus == "Aktif"){
+
+                        if(result[i].cargoInfo == ""){
+                            isteklerDivHtml +=  '<div class="col-sm-5 col-xs-6">';
+                            isteklerDivHtml +=  '<button class="btn btn-theme02" data-toggle="modal" data-target="#KargoModel" ' +
+                                ' onclick="kargoBilgileriniGir(' +JSON.stringify(result[i]._id).replace(/"/g,"&quot;") + ')"' + '> <i class="fa fa-heart"></i> Kargo Bilgilerini Gir </button>';
+                            isteklerDivHtml +=  '</div>';
+                        }
+
+                        isteklerDivHtml +=  '<form  action="/bagisiptal" method="post">'
+                        isteklerDivHtml +=  '<input type="text" class="form-control" placeholder="" value="'+ result[i]._id +'" name="id" hidden=true   style="display: none;"  autofocus>'
+                        isteklerDivHtml +=  '<button id="submitIstekIptal" class="btn- btn-info"> iptal et</button>'
+                        isteklerDivHtml +=  '</form>';
+
+                    }
+
+                  //  isteklerDivHtml +=  '<div class="col-sm-5 col-xs-6">';
+                  //  isteklerDivHtml +=  '<button class="btn btn-theme03" data-toggle="modal" data-target="#DonationModel" ' +
+                    //    ' onclick="bagisIdsiniYerlestir(' +JSON.stringify(result[i]._id).replace(/"/g,"&quot;") + ')"' +
+                      //  '> <i class="fa fa-heart"></i> Katkı Yap </button>';
+                   // isteklerDivHtml +=  '</div>';
+                   // isteklerDivHtml +=  '<form name="donationDetailForm" action="/istekGetir" method="post">'
+                   // isteklerDivHtml +=  '<input type="text" class="form-control" placeholder="" value="'+ result[i]._id +'" name="requestID" hidden=true   style="display: none;"  autofocus>'
+                   // isteklerDivHtml +=  '<button id="submitIstekGetir" class="btn- btn-info"> Detaylar</button>'
+                   // isteklerDivHtml +=  '</form>';
+
+
+                    isteklerDivHtml +=  '  </div>';
+                    isteklerDivHtml +=  '  </div>';
+
+
+                }
+                $('#isteklerDiv').html(isteklerDivHtml);
+
+            }
+        });
+    }
+
+    function kargoBilgileriniGir(bagisId) {
+        KargoForm.bagisId.value = bagisId;
+    }
 
 
 </script>
