@@ -17,7 +17,7 @@ var login = require('./routes/login');
 var signup = require('./routes/signup');
 var mainpage = require('./routes/mainpage');
 var temsilcibilgileri = require('./routes/temsilcibilgileri');
-var profile= require('./routes/profile');
+var profile = require('./routes/profile');
 var kullanicilar = require('./routes/kullanicilar');
 var esyabilgileri = require('./routes/esyabilgileri');
 var bagisistekleri = require('./routes/bagisistekleri');
@@ -36,13 +36,13 @@ app.set('view engine', 'ejs');
 app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(busboy());
-app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.urlencoded({extended: false}));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
-app.use(session({secret: 'ssshhhhh', saveUninitialized: true , resave: true}));
+app.use(session({secret: 'ssshhhhh', saveUninitialized: true, resave: true}));
 app.use(fileUpload());
 
-app.use(function(req,res,next){
+app.use(function (req, res, next) {
     req.db = db;
     next();
 });
@@ -60,17 +60,17 @@ app.use('/bagiscibilgileri', bagiscibilgileri);
 app.use('/istek', istek);
 app.use('/haziresyalar', haziresyalar);
 
-app.post('/loginprovider',function(req,res){
-    var e_mail=req.body.email.trim();
-    var password=req.body.password;
+app.post('/loginprovider', function (req, res) {
+    var e_mail = req.body.email.trim();
+    var password = req.body.password;
 
     var db = req.db;
     var users = db.get('users');
-    users.find({"email":e_mail,"password":password}, function(err, result) {
+    users.find({"email": e_mail, "password": password}, function (err, result) {
         if (err) throw err;
         console.log(result);
 
-        if(result.length > 0) {
+        if (result.length > 0) {
             req.session.email = e_mail;
             req.session.loggedin = true;
             req.session.usertype = result[0].usertype;
@@ -84,29 +84,31 @@ app.post('/loginprovider',function(req,res){
                 res.redirect('/mainpage');
             }
         }
-        else{
+        else {
             res.redirect('/login');
         }
     });
 });
 
 
-
-
-
-app.post('/yenikullanici',function(req,res){
-    var e_mail=req.body.email.trim();
-    var password=req.body.password;
-    var password2=req.body.password2;
-    var userType=req.body.usertype;
+app.post('/yenikullanici', function (req, res) {
+    var e_mail = req.body.email.trim();
+    var password = req.body.password;
+    var password2 = req.body.password2;
+    var userType = req.body.usertype;
 
 
     var db = req.db;
     var users = db.get('users');
-    users.insert({"email":e_mail,"password":password,"usertype":userType, "signupstatus":"infoneeded"}, function(err, result) {
+    users.insert({
+        "email": e_mail,
+        "password": password,
+        "usertype": userType,
+        "signupstatus": "infoneeded"
+    }, function (err, result) {
         if (err) throw err;
 
-        if(userType === "temsilci"){
+        if (userType === "temsilci") {
             req.session.email = e_mail;
             req.session.usertype = userType;
             req.session.loggedin = true;
@@ -118,20 +120,18 @@ app.post('/yenikullanici',function(req,res){
             req.session.usertype = userType;
             req.session.loggedin = true;
             req.session.infoneeded = true;
-            console.log(userType,"-----------------------");
+            console.log(userType, "-----------------------");
             res.redirect('/bagiscibilgileri');
         }
     });
 });
 
 
+app.post('/kullanicibilgileri', function (req, res) {
+    var e_mail = req.session.email;
+    var userType = req.body.usertype;
 
-
-app.post('/kullanicibilgileri',function(req,res){
-    var e_mail=req.session.email;
-    var userType=req.body.usertype;
-
-    if(userType === "temsilci") {
+    if (userType === "temsilci") {
         req.session.infoneeded = false;
         var db = req.db;
         var users = db.get('users');
@@ -155,7 +155,7 @@ app.post('/kullanicibilgileri',function(req,res){
             res.redirect('/mainpage');
         });
     }
-    else{ // bagisci
+    else { // bagisci
 
         var db = req.db;
         var users = db.get('users');
@@ -182,27 +182,30 @@ app.post('/kullanicibilgileri',function(req,res){
 
 });
 
-app.post('/kullanicilistesi',function(req,res){
+app.post('/kullanicilistesi', function (req, res) {
     var db = req.db;
     var users = db.get('users');
     var kullanicilar = {};
 
-    users.find({"usertype":"temsilci", "signupstatus":"confirmneeded"}, function(err, resultonayBekleyenTemsilciler) {
+    users.find({
+        "usertype": "temsilci",
+        "signupstatus": "confirmneeded"
+    }, function (err, resultonayBekleyenTemsilciler) {
         if (err) throw err;
 
         kullanicilar.onayBekleyenTemsilciler = resultonayBekleyenTemsilciler;
 
-        users.find({"usertype":"temsilci"}, function(err, resulttemsilciler) {
+        users.find({"usertype": "temsilci"}, function (err, resulttemsilciler) {
             if (err) throw err;
 
             kullanicilar.temsilciler = resulttemsilciler;
 
-            users.find({"usertype":"bagisci"}, function(err, resultbagiscilar) {
+            users.find({"usertype": "bagisci"}, function (err, resultbagiscilar) {
                 if (err) throw err;
 
                 kullanicilar.bagiscilar = resultbagiscilar;
 
-                users.find({"usertype":"admin"}, function(err, resultadminler) {
+                users.find({"usertype": "admin"}, function (err, resultadminler) {
                     if (err) throw err;
 
                     kullanicilar.adminler = resultadminler;
@@ -220,7 +223,7 @@ app.post('/kullanicilistesi',function(req,res){
     });
 });
 
-app.post('/temsilcionayla',function(req,res){
+app.post('/temsilcionayla', function (req, res) {
     var db = req.db;
     var users = db.get('users');
     users.update({"_id": req.body.id}, {
@@ -370,72 +373,73 @@ app.post('/esyaSil', function (req, res) {
     });
 });
 
-app.post('/esyalarigetir',function(req,res){
+app.post('/esyalarigetir', function (req, res) {
     var db = req.db;
     var items = db.get('item');
 
-    items.find({},function(err, result) {
+    items.find({}, function (err, result) {
         if (err) throw err;
         console.log(result);
         res.send(result);
     });
 });
 
-app.post('/yeniesyaekle',function(req,res){
+app.post('/yeniesyaekle', function (req, res) {
     var db = req.db;
     var items = db.get('item');
-    var itemType =req.body.itemType;
-    var item =req.body.item;
+    var itemType = req.body.itemType;
+    var item = req.body.item;
 
     items.update({"itemType": itemType}, {
         $addToSet: {
             "itemList": item
-        }},function(err, result) {
+        }
+    }, function (err, result) {
         if (err) throw err;
         res.redirect('/esyabilgileri');
     });
 });
 
-app.post('/yeniesyaturuekle',function(req,res){
+app.post('/yeniesyaturuekle', function (req, res) {
     var db = req.db;
     var items = db.get('item');
-    var itemType =req.body.itemType;
+    var itemType = req.body.itemType;
 
-    items.insert({"itemType":itemType,"itemList":[]},function(err, result) {
+    items.insert({"itemType": itemType, "itemList": []}, function (err, result) {
         if (err) throw err;
         res.redirect('/esyabilgileri');
     });
 });
 
-app.post('/bagisisteklerinigetir',function(req,res){
+app.post('/bagisisteklerinigetir', function (req, res) {
     var db = req.db;
     var donationRequests = db.get('donationRequests');
 
-    donationRequests.find({"status":"Aktif"},function(err, result) {
+    donationRequests.find({"status": "Aktif"}, function (err, result) {
         if (err) throw err;
         console.log(result);
         res.send(result);
     });
 });
 
-app.post('/istekGetir',function(req,res){
+app.post('/istekGetir', function (req, res) {
 
     var requestID = req.body.requestID;
 
     var db = req.db;
     var donationRequests = db.get('donationRequests');
 
-    donationRequests.find({"_id" :requestID},function(err, result) {
+    donationRequests.find({"_id": requestID}, function (err, result) {
         if (err) throw err;
 
-        console.log(requestID ,"---------------------------------------")
-        res.render('istek', { username: req.session.email, donationDetail : result[0]});
+        console.log(requestID, "---------------------------------------")
+        res.render('istek', {username: req.session.email, donationDetail: result[0]});
     });
 });
 
-app.post('/yeniBagis',function(req,res){
-    var itemType=req.body.itemType;
-    var item=req.body.item;
+app.post('/yeniBagis', function (req, res) {
+    var itemType = req.body.itemType;
+    var item = req.body.item;
     console.log("-----------------------------------------------------------------", item);
     var itemCount = req.body.requestedCount;
 
@@ -448,11 +452,20 @@ app.post('/yeniBagis',function(req,res){
     //     if (err) throw err;
     // });
 
-    users.find({"email":req.session.email}, function(err, result) {
+    users.find({"email": req.session.email}, function (err, result) {
         if (err) throw err;
 
-        donationRequests.insert({"date":currentTime,"status":"Aktif","user":req.session.email,"itemType":itemType, "address":result[0].address,
-            "item":item,"totalcount":itemCount.toString(), "donatedCount":0, "promisedCount":0}, function(err, result2) {
+        donationRequests.insert({
+            "date": currentTime,
+            "status": "Aktif",
+            "user": req.session.email,
+            "itemType": itemType,
+            "address": result[0].address,
+            "item": item,
+            "totalcount": itemCount.toString(),
+            "donatedCount": 0,
+            "promisedCount": 0
+        }, function (err, result2) {
             if (err) throw err;
 
             res.redirect('/mainpage');
@@ -461,8 +474,8 @@ app.post('/yeniBagis',function(req,res){
     });
 });
 
-app.post('/bagisekle',function(req,res){
-    var reqId=req.body.reqId;
+app.post('/bagisekle', function (req, res) {
+    var reqId = req.body.reqId;
     var donator = req.session.email;
     var donationCount = req.body.donationCount;
     console.log("-----------------------------------------------------------------", reqId);
@@ -473,37 +486,42 @@ app.post('/bagisekle',function(req,res){
     var users = db.get('users');
     var notif = db.get('notifications');
 
-    donationRequests.find({"_id":reqId}, function(err, result) {
+    donationRequests.find({"_id": reqId}, function (err, result) {
         if (err) throw err;
 
-        if(result.length > 0) {
-                donations.insert({"requestId":reqId,"date":currentTime,"donationStatus":"Aktif",
-                    "donator":donator, "donationCount":donationCount, "cargoInfo":"", "donationRequest":result[0]}, function(err, result3) {
+        if (result.length > 0) {
+            donations.insert({
+                "requestId": reqId, "date": currentTime, "donationStatus": "Aktif",
+                "donator": donator, "donationCount": donationCount, "cargoInfo": "", "donationRequest": result[0]
+            }, function (err, result3) {
+                if (err) throw err;
+
+                donationRequests.update({"_id": reqId}, {
+                    $inc: {
+                        "promisedCount": result[0].promisedCount + donationCount
+                    }
+                }, function (err, result4) {
                     if (err) throw err;
-
-                    donationRequests.update({"_id":reqId}, { $set: {
-                        "promisedCount": result[0].promisedCount+donationCount
-                    }}, function(err, result4) {
+                    var notifMessage = " sizin isteğinize bir bağışta bulundu.";
+                    notif.insert({
+                        "from": req.session.email, "to": result[0].user, "date": currentTime,
+                        "notificationStatus": "unseen", "message": notifMessage
+                    }, function (err, result5) {
                         if (err) throw err;
-                        var notifMessage = " sizin isteğinize bir bağışta bulundu.";
-                        notif.insert({"from":req.session.email, "to":result[0].user,"date":currentTime,
-                            "notificationStatus":"unseen", "message": notifMessage}, function(err, result5) {
-                            if (err) throw err;
 
-                            res.redirect('/profile');
-                        });
+                        res.redirect('/profile');
                     });
                 });
+            });
         }
     });
-
 
 
     res.redirect('/profile');
 });
 
 
-app.post('/kullanicininbagislarinigetir',function(req,res) {
+app.post('/kullanicininbagislarinigetir', function (req, res) {
     var db = req.db;
     var donations = db.get('donation');
 
@@ -515,26 +533,30 @@ app.post('/kullanicininbagislarinigetir',function(req,res) {
     });
 });
 
-app.post('/kargobilgisiekle',function(req,res) {
+app.post('/kargobilgisiekle', function (req, res) {
     var db = req.db;
     var donations = db.get('donation');
     var notif = db.get('notifications');
 
-    donations.findOneAndUpdate({"_id": req.body.bagisId}, { $set: {
-        "cargoInfo": {"cargoCompany":req.body.cargoCompany,"trackingNo":req.body.trackingNo}
-    }}, function (err, result) {
+    donations.findOneAndUpdate({"_id": req.body.bagisId}, {
+        $set: {
+            "cargoInfo": {"cargoCompany": req.body.cargoCompany, "trackingNo": req.body.trackingNo}
+        }
+    }, function (err, result) {
         if (err) throw err;
 
         var notifMessage = " bağışa ait kargo bilgisini girdi.";
-        notif.insert({"from":req.session.email, "to":result.donationRequest.user,"date":currentTime,
-            "notificationStatus":"unseen", "message": notifMessage}, function(err, result5) {
+        notif.insert({
+            "from": req.session.email, "to": result.donationRequest.user, "date": currentTime,
+            "notificationStatus": "unseen", "message": notifMessage
+        }, function (err, result5) {
             if (err) throw err;
         });
     });
     res.redirect('/profile');
 });
 
-app.post('/esyayatalipol',function(req,res) {
+app.post('/esyayatalipol', function (req, res) {
     var db = req.db;
     var donatorItems = db.get('donatorItems');
     var notif = db.get('notifications');
@@ -543,9 +565,11 @@ app.post('/esyayatalipol',function(req,res) {
     donatorItems.find({"_id": req.body.haziresyaid}, function (err, result) {
         if (err) throw err;
 
-        var notifMessage = " elinizdeki eşyaya talip oldu: "+ result[0].itemCount +" adet " + result[0].itemName ;
-        notif.insert({"from":req.session.email, "to":result[0].donator,"date":currentTime,
-            "notificationStatus":"unseen", "message": notifMessage}, function(err, result5) {
+        var notifMessage = " elinizdeki eşyaya talip oldu: " + result[0].itemCount + " adet " + result[0].itemName;
+        notif.insert({
+            "from": req.session.email, "to": result[0].donator, "date": currentTime,
+            "notificationStatus": "unseen", "message": notifMessage
+        }, function (err, result5) {
             if (err) throw err;
             res.send("success");
         });
@@ -553,19 +577,21 @@ app.post('/esyayatalipol',function(req,res) {
 
 });
 
-app.post('/bagisiptal',function(req,res) {
+app.post('/bagisiptal', function (req, res) {
     var db = req.db;
     var donations = db.get('donation');
 
-    donations.update({"_id": req.body.id}, { $set: {
-        "donationStatus": "iptal"
-    }}, function (err, result) {
+    donations.update({"_id": req.body.id}, {
+        $set: {
+            "donationStatus": "iptal"
+        }
+    }, function (err, result) {
         if (err) throw err;
         res.redirect('/profile')
     });
 });
 
-app.post('/eldekiesyayiekle',function(req,res) {
+app.post('/eldekiesyayiekle', function (req, res) {
     var db = req.db;
     var donatorItems = db.get('donatorItems');
     var currentTime = new Date();
@@ -575,73 +601,374 @@ app.post('/eldekiesyayiekle',function(req,res) {
     var img = req.files.foto;
     var filename = req.body.foto;
 
-    img.mv(__dirname + '/public/images/' + img.name, function(err) {
+    img.mv(__dirname + '/public/images/' + img.name, function (err) {
         if (err)
             return res.status(500).send(err);
 
     });
 
-    donatorItems.insert({"donator":req.session.email,"date":currentTime,"itemStatus":"Aktif",
-         "itemCount":req.body.eldekiSayi, "remainingItemCount":req.body.eldekiSayi,  "itemType":req.body.itemType, "itemName":req.body.item, "imagePath":req.body.foto}, function(err, result3) {
+    donatorItems.insert({
+        "donator": req.session.email,
+        "date": currentTime,
+        "itemStatus": "Aktif",
+        "itemCount": req.body.eldekiSayi,
+        "remainingItemCount": req.body.eldekiSayi,
+        "itemType": req.body.itemType,
+        "itemName": req.body.item,
+        "imagePath": req.body.foto
+    }, function (err, result3) {
         if (err) throw err;
 
-            res.redirect('/mainpage');
+        res.redirect('/mainpage');
     });
 
 });
 
-app.post('/haziresyalarigetir',function(req,res){
+app.post('/haziresyalarigetir', function (req, res) {
     var db = req.db;
     var donatorItems = db.get('donatorItems');
 
-    donatorItems.find({"itemStatus":"Aktif"},function(err, result) {
+    donatorItems.find({"itemStatus": "Aktif"}, function (err, result) {
         if (err) throw err;
         console.log(result);
         res.send(result);
     });
 });
 
-app.post('/bildirimlerial',function(req,res){
+app.post('/bildirimlerial', function (req, res) {
     var db = req.db;
     var notifications = db.get('notifications');
 
-    notifications.find({"to":req.session.email,"notificationStatus":"unseen"},function(err, result) {
+    notifications.find({"to": req.session.email, "notificationStatus": "unseen"}, function (err, result) {
         if (err) throw err;
         console.log(result);
         res.send(result);
     });
 });
 
-app.post('/bildirimlerigorulduyap',function(req,res){
+app.post('/bildirimlerigorulduyap', function (req, res) {
     var db = req.db;
     var notifications = db.get('notifications');
 
-   res.send("success");
+    res.send("success");
 });
 
-app.get('/logout',function(req,res){
+app.get('/logout', function (req, res) {
     req.session.destroy();
     res.redirect('/');
 });
 
-app.get('/wsUser', function (req, res) {
+app.get('/wsConfirmUser', function (req, res) {
+
+    var username = req.query.username;
+    var password = req.query.password;
     var db = req.db;
     var users = db.get('users');
-    users.find({}, function (err, result) {
+    users.find({"email": username, "password": password}, function (err, result) {
         if (err) throw err;
-        res.json(result);
+        console.log(result);
+
+        if (result.length > 0) {
+            res.send(JSON.stringify(result[0], null, 2));
+        }
+        else {
+            res.json({"_id": "null"});
+
+        }
+    });
+});
+
+app.get('/wsAddUser', function (req, res) {
+    var e_mail = req.query.email;
+    var password = req.query.password;
+    var userType = req.query.usertype;
+    var school = req.query.school;
+    var name = req.query.name;
+    var birthdate = req.query.birthdate;
+    var address = req.query.address;
+    var phone = req.query.phone;
+
+    var db = req.db;
+    var users = db.get('users');
+    users.insert({
+        "email": e_mail,
+        "password": password,
+        "usertype": userType,
+        "signupstatus": "infoneeded",
+        "school": school,
+        "name": name,
+        "birthdate": birthdate,
+        "address": address,
+        "phone": phone
+    }, function (err, result) {
+        if (err) throw err;
+        console.log(result._id, "------------------------wsAddUser-------------------");
+        if (result._id != null) {
+            users.find({"_id": result._id}, function (err, result2) {
+                if (err) throw err;
+                if (result2.length > 0) {
+                    res.send(JSON.stringify(result2[0], null, 2));
+                }
+            });
+        } else {
+            res.json({"_id": "null"});
+        }
+
+    });
+});
+
+
+app.get('/wsUpdateUser', function (req, res) {
+    var id = req.query.id;
+    var e_mail = req.query.email;
+    var password = req.query.password;
+    var school = req.query.school;
+    var name = req.query.name;
+    var birthdate = req.query.birthdate;
+    var address = req.query.address;
+    var phone = req.query.phone;
+
+    var db = req.db;
+    var users = db.get('users');
+
+    users.find({"_id": id}, function (err, result2) {
+        if (err) throw err;
+        if (result2.length < 1) {
+
+            res.json({"_id": "null"});
+        }
+    });
+
+    users.update({"_id": id}, {
+        $set: {
+            "email": e_mail,
+            "password": password,
+            "school": school,
+            "name": name,
+            "birthdate": birthdate,
+            "address": address,
+            "phone": phone
+        }
+
+    }, function (err, result) {
+        if (err) throw err;
+        console.log(result, "------------------------wsUpdateUser-------------------");
+
+        users.find({"_id": id}, function (err, result2) {
+            if (err) throw err;
+            if (result2.length > 0) {
+                res.send(JSON.stringify(result2[0], null, 2));
+            } else {
+                res.json({"_id": "null"});
+            }
+        });
+
+
+    });
+});
+
+app.get('/wsGetAllRequests', function (req, res) {
+
+
+    var db = req.db;
+    var donationRequests = db.get('donationRequests');
+    donationRequests.find({}, function (err, result) {
+        if (err) throw err;
+        if (result.length > 0) {
+            res.send(JSON.stringify(result, null, 2));
+        }
+        else {
+            res.json({"_id": "null"});
+
+        }
+    });
+});
+
+app.get('/wsGetUsersRequests', function (req, res) {
+
+    var email= req.query.email;
+    var db = req.db;
+    var donationRequests = db.get('donationRequests');
+    donationRequests.find({"user": email}, function (err, result) {
+        if (err) throw err;
+        if (result.length > 0) {
+            res.send(JSON.stringify(result, null, 2));
+        }
+        else {
+            res.json({"_id": "null"});
+
+        }
+    });
+});
+
+app.get('/wsGetRequestByID', function (req, res) {
+
+    var id= req.query.id;
+    var db = req.db;
+    var donationRequests = db.get('donationRequests');
+    donationRequests.find({"_id": id}, function (err, result) {
+        if (err) throw err;
+        if (result.length > 0) {
+            res.send(JSON.stringify(result, null, 2));
+        }
+        else {
+            res.json({"_id": "null"});
+
+        }
+    });
+});
+
+app.get('/wsMakeDonation', function (req, res) {
+
+    var id= req.query.id;
+    var user= req.query.user;
+    var count = req.query.count;
+    var currentTime = new Date();
+    var db = req.db;
+    var donationRequests = db.get('donationRequests');
+    donationRequests.update({"_id": id}, {
+        $inc: { "donatedCount": +count}
+
+    }, function (err, result) {
+        if (err) throw err;
+        console.log(result, "------------------------------------------");
+
+        var donations = db.get('donation');
+        donations.insert({
+            "requestId": id, "date": currentTime, "donationStatus": "Aktif",
+            "donator": user, "donationCount": count, "cargoInfo": ""
+        }, function (err, result) {
+            if (err) throw err;
+
+        });
+        donationRequests.find({"_id": id}, function (err, result2) {
+            if (err) throw err;
+            if (result2.length > 0) {
+                res.send(JSON.stringify(result2[0], null, 2));
+            } else {
+                res.json({"_id": "null"});
+            }
+        });
+
+
+    });
+
+});
+
+app.get('/wsGetUsersDonations', function (req, res) {
+
+    var email= req.query.email;
+    var db = req.db;
+    var donationRequests = db.get('donation');
+    donationRequests.find({"donator": email}, function (err, result) {
+        if (err) throw err;
+        if (result.length > 0) {
+            res.send(JSON.stringify(result, null, 2));
+        }
+        else {
+            res.json({"_id": "null"});
+
+        }
+    });
+});
+
+app.get('/wsGetAllDonations', function (req, res) {
+    var db = req.db;
+    var donations = db.get('donation');
+    donations.find({}, function (err, result) {
+        if (err) throw err;
+        if (result.length > 0) {
+            res.send(JSON.stringify(result, null, 2));
+        }
+        else {
+            res.json({"_id": "null"});
+
+        }
+    });
+});
+
+app.get('/wsGetAllItems', function (req, res) {
+    var db = req.db;
+    var items = db.get('item');
+    items.find({}, function (err, result) {
+        if (err) throw err;
+        if (result.length > 0) {
+            res.send(JSON.stringify(result, null, 2));
+        }
+        else {
+            res.json({"_id": "null"});
+        }
+    });
+});
+
+app.get('/wsGetItemTypeByID', function (req, res) {
+    var id = req.query.id;
+    var db = req.db;
+    var items = db.get('item');
+    items.find({"_id": id}, function (err, result) {
+        if (err) throw err;
+        if (result.length > 0) {
+            res.send(JSON.stringify(result, null, 2));
+        }
+        else {
+            res.json({"_id": "null"});
+        }
+    });
+});
+
+app.get('/wsGetAllAvailableItems', function (req, res) {
+    var db = req.db;
+    var donatorItems = db.get('donatorItems');
+    donatorItems.find({}, function (err, result) {
+        if (err) throw err;
+        if (result.length > 0) {
+            res.send(JSON.stringify(result, null, 2));
+        }
+        else {
+            res.json({"_id": "null"});
+        }
+    });
+});
+
+app.get('/wsGetAllAvailableItemsOfUser', function (req, res) {
+    var user= req.query.email;
+    var db = req.db;
+    var donatorItems = db.get('donatorItems');
+    donatorItems.find({"donator": user }, function (err, result) {
+        if (err) throw err;
+        if (result.length > 0) {
+            res.send(JSON.stringify(result, null, 2));
+        }
+        else {
+            res.json({"_id": "null"});
+        }
+    });
+});
+
+app.get('/wsGetAllAvailableItemByID', function (req, res) {
+    var id= req.query.id;
+    var db = req.db;
+    var donatorItems = db.get('donatorItems');
+    donatorItems.find({"_id": id}, function (err, result) {
+        if (err) throw err;
+        if (result.length > 0) {
+            res.send(JSON.stringify(result, null, 2));
+        }
+        else {
+            res.json({"_id": "null"});
+        }
     });
 });
 
 // catch 404 and forward to error handler
-app.use(function(req, res, next) {
+app.use(function (req, res, next) {
     var err = new Error('Not Found');
     err.status = 404;
     next(err);
 });
 
 // error handler
-app.use(function(err, req, res, next) {
+app.use(function (err, req, res, next) {
     // set locals, only providing error in development
     res.locals.message = err.message;
     res.locals.error = req.app.get('env') === 'development' ? err : {};
@@ -650,6 +977,5 @@ app.use(function(err, req, res, next) {
     res.status(err.status || 500);
     res.render('error');
 });
-
 
 module.exports = app;
