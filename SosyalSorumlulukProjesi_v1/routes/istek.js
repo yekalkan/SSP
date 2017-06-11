@@ -11,7 +11,7 @@ router.get('/', function(req, res, next) {
     donationRequests.find({"_id" :requestID},function(err, result) {
         if (err) throw err;
 
-     res.render('istek', { username: req.session.email, donationDetail : result[0]});
+     res.render('istek', { username: req.session.email, donationDetail : result[0],userrealname: req.session.userrealname});
         res.redirect('/');
 
     });

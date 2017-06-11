@@ -74,6 +74,7 @@ app.post('/loginprovider', function (req, res) {
             req.session.email = e_mail;
             req.session.loggedin = true;
             req.session.usertype = result[0].usertype;
+            req.session.userrealname = result[0].name;
 
             if (result[0].usertype === "temsilci" && result[0].signupstatus === "infoneeded") {
                 req.session.infoneeded = true;
@@ -433,7 +434,7 @@ app.post('/istekGetir', function (req, res) {
         if (err) throw err;
 
         console.log(requestID, "---------------------------------------")
-        res.render('istek', {username: req.session.email, donationDetail: result[0]});
+        res.render('istek', {username: req.session.email, donationDetail: result[0],userrealname: req.session.userrealname});
     });
 });
 
@@ -537,6 +538,7 @@ app.post('/kargobilgisiekle', function (req, res) {
     var db = req.db;
     var donations = db.get('donation');
     var notif = db.get('notifications');
+    var currentTime = new Date();
 
     donations.findOneAndUpdate({"_id": req.body.bagisId}, {
         $set: {
@@ -545,15 +547,17 @@ app.post('/kargobilgisiekle', function (req, res) {
     }, function (err, result) {
         if (err) throw err;
 
-        var notifMessage = " bağışa ait kargo bilgisini girdi.";
+        var notifMessage = " bağışa ait kargo bilgisi: " + req.body.trackingNo + "("+req.body.cargoCompany+")";
         notif.insert({
             "from": req.session.email, "to": result.donationRequest.user, "date": currentTime,
             "notificationStatus": "unseen", "message": notifMessage
         }, function (err, result5) {
             if (err) throw err;
+
+            res.redirect('/profile');
         });
     });
-    res.redirect('/profile');
+
 });
 
 app.post('/esyayatalipol', function (req, res) {
@@ -615,7 +619,7 @@ app.post('/eldekiesyayiekle', function (req, res) {
         "remainingItemCount": req.body.eldekiSayi,
         "itemType": req.body.itemType,
         "itemName": req.body.item,
-        "imagePath": req.body.foto
+        "imagePath": img.name
     }, function (err, result3) {
         if (err) throw err;
 
@@ -649,6 +653,16 @@ app.post('/bildirimlerial', function (req, res) {
 app.post('/bildirimlerigorulduyap', function (req, res) {
     var db = req.db;
     var notifications = db.get('notifications');
+    //var notifs = req.body.notifs;
+    var str = req.body.notifs;
+    var notifs = JSON.parse(str);
+
+
+    for(var i = 0; i < notifs.length;i++){
+        notifications.update({"_id": notifs[i]._id}, { $set: {"notificationStatus": "seen"} }, function (err, result) {
+            if (err) throw err;
+        });
+    }
 
     res.send("success");
 });

@@ -24,7 +24,7 @@ router.get('/', function(req, res, next) {
         console.log(result);
 
         if(result.length > 0) {
-            res.render('profile',{user:result[0],username:req.session.email});
+            res.render('profile',{user:result[0],username:req.session.email,userrealname: req.session.userrealname});
         }
         else{
             res.send("user not found.");

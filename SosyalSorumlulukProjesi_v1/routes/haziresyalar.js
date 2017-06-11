@@ -11,14 +11,14 @@ router.get('/', function(req, res, next) {
             res.redirect('/temsilcibilgileri');
         }
         else{
-            res.render('haziresyalar', { username: req.session.email});
+            res.render('haziresyalar', { username: req.session.email,userrealname: req.session.userrealname});
         }
     }
     else if(req.session.usertype === "bagisci"){
-        res.render('haziresyalar', { username: req.session.email});
+        res.render('haziresyalar', { username: req.session.email,userrealname: req.session.userrealname});
     }
     else if(req.session.usertype === "admin"){
-        res.render('haziresyalar', { username: req.session.email});
+        res.render('haziresyalar', { username: req.session.email,userrealname: req.session.userrealname});
     }
 
 });

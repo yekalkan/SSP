@@ -108,7 +108,7 @@
                     isteklerDivHtml +=  ' <div class="weather-2-header">';
                     isteklerDivHtml +=  '  <div class="row">';
                     isteklerDivHtml +=  '  <div class="col-sm-6 col-xs-6">';
-                    isteklerDivHtml +=  ' <p>İzmir</p>';
+                    isteklerDivHtml +=  ' <p>'+result[i].address.city+'</p>';
                     isteklerDivHtml +=  ' </div>';
                     isteklerDivHtml +=  '<div class="col-sm-6 col-xs-6 goright">';
                     isteklerDivHtml +=  '  <p class="small">12 nisan, 2017</p>';
@@ -124,13 +124,13 @@
                     isteklerDivHtml +=  '  <div class="row data">';
                     isteklerDivHtml +=  ' <div class="col-sm-6 col-xs-6 goleft">';
                     isteklerDivHtml +=  ' <h6><b>'+result[i].totalcount+ '&nbspadet&nbsp' + result[i].item + '&nbsplazım'+'</b></h6>';
-                    isteklerDivHtml +=  ' <h6> **</h6>';
-                    isteklerDivHtml +=  ' <h6>'+proggress+'º min</h6>';
+                    isteklerDivHtml +=  ' <h6>'+'</h6>';
+                    isteklerDivHtml +=  ' <h6>'+'</h6>';
                     isteklerDivHtml +=  '</div>';
                     isteklerDivHtml +=  ' <div class="col-sm-6 col-xs-6 goright">';
-                    isteklerDivHtml +=  '  <h5><i class="fa fa-angle-down"></i></h5>';
-                    isteklerDivHtml +=  '  <h6><b>***</b></h6>';
-                    isteklerDivHtml +=  '  <h5>*****</h5>';
+                    isteklerDivHtml +=  '  <h5>'+'</h5>';
+                    isteklerDivHtml +=  '  <h6><b>'+'</b></h6>';
+                    isteklerDivHtml +=  '  <h5>'+'</h5>';
                     isteklerDivHtml +=  '  </div>';
                     isteklerDivHtml +=  '</div>';
 
@@ -141,7 +141,7 @@
                     isteklerDivHtml +=  '</div>';
                     isteklerDivHtml +=  '<form name="donationDetailForm" action="/istekGetir" method="post">'
                     isteklerDivHtml +=  '<input type="text" class="form-control" placeholder="" value="'+ result[i]._id +'" name="requestID" hidden=true   style="display: none;"  autofocus>'
-                    isteklerDivHtml +=  '<button id="submitIstekGetir" class="btn- btn-info"> Detaylar</button>'
+                    //isteklerDivHtml +=  '<button id="submitIstekGetir" class="btn- btn-info"> Detaylar</button>'
                     isteklerDivHtml +=  '</form>';
 
                     isteklerDivHtml +=  result[i].donatedCount+'/'+result[i].totalcount;

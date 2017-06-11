@@ -13,7 +13,7 @@ router.get('/', function(req, res, next) {
     }
 */
 
-    res.render('esyabilgileri', { username: req.session.email});
+    res.render('esyabilgileri', { username: req.session.email, userrealname: req.session.userrealname });
 });
 
 module.exports = router;

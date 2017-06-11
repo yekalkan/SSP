@@ -38,7 +38,7 @@
 
 <div class="top-menu">
     <ul class="nav pull-right top-menu">
-        <li><a class="logout" href="/logout">Logout</a></li>
+        <li><a class="logout" href="/logout">Çıkış</a></li>
     </ul>
 </div>
 
@@ -149,10 +149,14 @@
     }
 
     function markNotifications(){
+
+        console.log(notifications);
+
         $.ajax({
             type: 'POST',
             url: '/bildirimlerigorulduyap',
-            data: {notifs:notifications},
+            data: {notifs: JSON.stringify(notifications) },
+            datatype: 'text',
             success: function(result) {
 
             }
