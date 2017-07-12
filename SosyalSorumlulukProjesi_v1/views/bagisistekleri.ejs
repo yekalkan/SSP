@@ -101,7 +101,7 @@
                 var isteklerDivHtml = '';
                 for (i = 0; i< result.length; i++) {
 
-                    var proggress = (result[i].donatedCount/result[i].totalcount)*((100/result[i].totalcount)/(100/result[i].totalcount))*100 | 0;
+                    var proggress = ((result[i].donatedCount+result[i].promisedCount)/result[i].totalcount)*((100/result[i].totalcount)/(100/result[i].totalcount))*100 | 0;
 
                     isteklerDivHtml +=  '<div class="col-lg-4 col-md-4 col-sm-4 mb">';
                     isteklerDivHtml +=  ' <div class="weather-2 pn">';
@@ -111,19 +111,21 @@
                     isteklerDivHtml +=  ' <p>'+result[i].address.city+'</p>';
                     isteklerDivHtml +=  ' </div>';
                     isteklerDivHtml +=  '<div class="col-sm-6 col-xs-6 goright">';
-                    isteklerDivHtml +=  '  <p class="small">12 nisan, 2017</p>';
+                    isteklerDivHtml +=  '  <p class="small">'+result[i].date+'</p>';
                     isteklerDivHtml +=  '</div>';
                     isteklerDivHtml +=  ' </div>';
                     isteklerDivHtml +=  ' </div>';
 
                     isteklerDivHtml +=  '<div class="row centered">';
-
-                    isteklerDivHtml +=  ' <img src="images/bagisistekornek.jpg" class="img-rounded" width="120"> ';
-
+                    if(result[i].itemType=="giysi"){
+                        isteklerDivHtml +=  ' <img src="images/clothes.jpg" class="img-rounded" width="100"> ';
+                    } else {
+                        isteklerDivHtml += ' <img src="images/bagisistekornek.jpg" class="img-rounded" width="150"> ';
+                    }
                     isteklerDivHtml +=  '  </div>';
                     isteklerDivHtml +=  '  <div class="row data">';
+                    isteklerDivHtml +=  ' <h6><b>'+result[i].description+'</b></h6>';
                     isteklerDivHtml +=  ' <div class="col-sm-6 col-xs-6 goleft">';
-                    isteklerDivHtml +=  ' <h6><b>'+result[i].totalcount+ '&nbspadet&nbsp' + result[i].item + '&nbsplazım'+'</b></h6>';
                     isteklerDivHtml +=  ' <h6>'+'</h6>';
                     isteklerDivHtml +=  ' <h6>'+'</h6>';
                     isteklerDivHtml +=  '</div>';
@@ -141,13 +143,13 @@
                     isteklerDivHtml +=  '</div>';
                     isteklerDivHtml +=  '<form name="donationDetailForm" action="/istekGetir" method="post">'
                     isteklerDivHtml +=  '<input type="text" class="form-control" placeholder="" value="'+ result[i]._id +'" name="requestID" hidden=true   style="display: none;"  autofocus>'
-                    //isteklerDivHtml +=  '<button id="submitIstekGetir" class="btn- btn-info"> Detaylar</button>'
+                    isteklerDivHtml +=  '<button id="submitIstekGetir" class="btn- btn-info"> Detaylar</button>'
                     isteklerDivHtml +=  '</form>';
 
-                    isteklerDivHtml +=  result[i].donatedCount+'/'+result[i].totalcount;
+                    isteklerDivHtml +=  (parseInt(result[i].donatedCount)+parseInt(result[i].promisedCount))+'/'+result[i].totalcount;
                     isteklerDivHtml +=  ' <div class="progress">';
                     isteklerDivHtml +=   '<div class="progress-bar progress-bar-success" role="progressbar"';
-                    isteklerDivHtml +=   'aria-valuenow="'+result[i].donatedCount+'" aria-valuemin="0" aria-valuemax="'+result[i].totalcount+'" style="width: '+proggress+'%"> ' +
+                    isteklerDivHtml +=   'aria-valuenow="'+result[i].donatedCount+result[i].promisedCount +'" aria-valuemin="0" aria-valuemax="'+result[i].totalcount+'" style="width: '+proggress+'%"> ' +
                         ''+proggress+'% </div></div>';
                     isteklerDivHtml +=  '  </div>';
                     isteklerDivHtml +=  '  </div>';

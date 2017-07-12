@@ -2,7 +2,7 @@
     <div class="fa fa-bars tooltips" data-placement="right" data-original-title="Toggle Navigation"></div>
 </div>
 <!--logo start-->
-<a href="/" class="logo"><b> SSP </b></a>
+<a href="/" class="logo"><b> YARDIM SELİ </b></a>
 <!--logo end-->
 <div class="nav notify-row" id="top_menu">
     <!--  notification start -->
@@ -11,7 +11,7 @@
         <li id="header_inbox_bar" class="dropdown">
             <a data-toggle="dropdown" class="dropdown-toggle" onclick="markNotifications()">
                 <i class="fa fa-envelope-o"></i>
-                <span id="notifCount" class="badge bg-theme">2</span>
+                <span id="notifCount" class="badge bg-theme">!</span>
             </a>
             <ul id="notifs" class="dropdown-menu extended inbox">
 
@@ -26,13 +26,21 @@
 
 <div class="top-menu">
     <ul class="nav pull-left top-menu">
-        <li><button class="logout" data-toggle="modal" data-target="#RequestModel" onclick="getItemTypes()" ><i class="fa fa-plus-square" ></i> Yeni İstek Oluştur </button></li>
+        <li>
+            <button class="logout" data-toggle="modal" data-target="#RequestModel" onclick="getItemTypes()"><i
+                        class="fa fa-plus-square"></i> Yeni İstek Oluştur
+            </button>
+        </li>
     </ul>
 </div>
 
 <div class="top-menu">
     <ul class="nav pull-left top-menu">
-        <li><button class="logout" data-toggle="modal" data-target="#EldekiEsyaModel" onclick="getItemTypes()" ><i class="fa fa-plus-square" ></i> Elindeki Eşyayı Ekle </button></li>
+        <li>
+            <button class="logout" data-toggle="modal" data-target="#EldekiEsyaModel" onclick="getItemTypes()"><i
+                        class="fa fa-plus-square"></i> Elindeki Eşyayı Ekle
+            </button>
+        </li>
     </ul>
 </div>
 
@@ -42,7 +50,8 @@
     </ul>
 </div>
 
-<div class="modal fade" id="RequestModel" tabindex="-1" role="dialog" aria-labelledby="RequestModelLabel" aria-hidden="true" data-backdrop="false">
+<div class="modal fade" id="RequestModel" tabindex="-1" role="dialog" aria-labelledby="RequestModelLabel"
+     aria-hidden="true" data-backdrop="false">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
@@ -52,18 +61,24 @@
             <div class="modal-body">
                 <form name="newRequest" action="/yeniBagis" method="post">
 
-                        Tür: <select class="form-control" name="itemType" id="itemTypes" onchange="setItems()">
-                        </select><br>
+                    Tür: <select class="form-control" name="itemType" id="itemTypes" onchange="setItems()">
+                    </select><br>
 
-                        Eşya:
-                        <select  class="form-control" name="item"  id="items1" >
-                        </select><br>
+                    Eşya:
+                    <select class="form-control" name="item" id="items1">
+                    </select><br>
 
-                        <br>
-                        <br>
-                        <input id="requestedCount"  type="number" class="form-control" placeholder="Adet" name="requestedCount" autofocus min="1">
-                        <br>
-                        <button class="btn btn-theme btn-block" id="submitbutton"> <i class="fa fa-plus"></i> Talep Ekle</button>
+                    <br>
+                    <br>
+                    <input id="description" type="text" class="form-control" placeholder="Açıklama"
+                           name="description" autofocus min="1">
+                    <br>
+                    <br>
+                    <input id="requestedCount" type="number" class="form-control" placeholder="Adet"
+                           name="requestedCount" autofocus min="1">
+                    <br>
+                    <button class="btn btn-theme btn-block" id="submitbutton"><i class="fa fa-plus"></i> Talep Ekle
+                    </button>
 
                 </form>
 
@@ -74,7 +89,8 @@
 </div>
 
 
-<div class="modal fade" id="EldekiEsyaModel" tabindex="-1" role="dialog" aria-labelledby="EldekiEsyaModelLabel" aria-hidden="true" data-backdrop="false">
+<div class="modal fade" id="EldekiEsyaModel" tabindex="-1" role="dialog" aria-labelledby="EldekiEsyaModelLabel"
+     aria-hidden="true" data-backdrop="false">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
@@ -88,16 +104,17 @@
                     </select><br>
 
                     Eşya:
-                    <select  class="form-control" name="item"  id="itemsXD" >
+                    <select class="form-control" name="item" id="itemsXD">
                     </select><br>
 
                     <br>
                     <br>
                     <input type="number" class="form-control" placeholder="Adet" name="eldekiSayi" autofocus min="1">
                     <br>
-                    <input type="file" class="form-control" placeholder="Adet" name="foto">
+                    <input type="file" class="form-control" placeholder="Eşya Fotoğrafı" name="foto">
                     <br>
-                    <button class="btn btn-theme btn-block" id="submitbutton"> <i class="fa fa-plus"></i> Eşyaları Ekle</button>
+                    <button class="btn btn-theme btn-block" id="submitbutton"><i class="fa fa-plus"></i> Eşyaları Ekle
+                    </button>
 
                 </form>
 
@@ -113,12 +130,12 @@
     var allItems = {};
     var notifications = {};
 
-    function getNotifications(){
+    function getNotifications() {
         console.log("xd");
         $.ajax({
             type: 'POST',
             url: '/bildirimlerial',
-            success: function(result) {
+            success: function (result) {
                 console.log(result);
                 notifs = result;
                 notifications = result;
@@ -126,15 +143,15 @@
                 var itemsHtml = "";
 
 
-                itemsHtml += '<div class="notify-arrow notify-arrow-green"></div> <li><p class="green">'+ notifs.length+' yeni bildiriminiz var</p> </li>';
+                itemsHtml += '<div class="notify-arrow notify-arrow-green"></div> <li><p class="green">' + notifs.length + ' yeni bildiriminiz var</p> </li>';
 
-                for (var i = 0; i< notifs.length; i++) {
+                for (var i = 0; i < notifs.length; i++) {
                     itemsHtml += ' <li>';
                     itemsHtml += '<a >';
                     //itemsHtml += '    <span class="photo"><img alt="avatar" src="images/ui-zac.jpg"></span>';
                     //itemsHtml += '   <span class="subject">';
-                    itemsHtml += '    <span class="from">'+notifs[i].from+'</span> <br>';
-                    itemsHtml += ' <span class="time">'+'</span>';
+                    itemsHtml += '    <span class="from">' + notifs[i].from + '</span> <br>';
+                    itemsHtml += ' <span class="time">' + '</span>';
                     itemsHtml += '  </span>';
                     itemsHtml += '  <span class="message">';
                     itemsHtml += notifs[i].message;
@@ -148,32 +165,32 @@
         });
     }
 
-    function markNotifications(){
+    function markNotifications() {
 
         console.log(notifications);
 
         $.ajax({
             type: 'POST',
             url: '/bildirimlerigorulduyap',
-            data: {notifs: JSON.stringify(notifications) },
+            data: {notifs: JSON.stringify(notifications)},
             datatype: 'text',
-            success: function(result) {
+            success: function (result) {
 
             }
         });
     }
 
-    function getItemTypes(){
+    function getItemTypes() {
         $.ajax({
             type: 'POST',
             url: '/esyalarigetir',
-            success: function(result) {
+            success: function (result) {
                 items = result;
                 allItems = result;
                 var itemsHtml = "";
-                for (var i = 0; i< items.length; i++) {
-                    itemsHtml +=  '<option value:"'+ items[i].itemType + '">';
-                    itemsHtml +=   items[i].itemType + '</option>';
+                for (var i = 0; i < items.length; i++) {
+                    itemsHtml += '<option value:"' + items[i].itemType + '">';
+                    itemsHtml += items[i].itemType + '</option>';
                 }
                 $('#itemTypes').html(itemsHtml);
                 $('#itemTypesXD').html(itemsHtml);
@@ -183,26 +200,24 @@
         });
     }
 
-    function setItems(){
+    function setItems() {
         var i = itemTypes.selectedIndex;
         var itemLists = "";
-        for (var k = 0; k< allItems[i].itemList.length; k++)
-        {
-            itemLists +=  '<option value:"'+ allItems[i].itemList[k] + '">';
-            itemLists +=   allItems[i].itemList[k] + '</option>';
+        for (var k = 0; k < allItems[i].itemList.length; k++) {
+            itemLists += '<option value:"' + allItems[i].itemList[k] + '">';
+            itemLists += allItems[i].itemList[k] + '</option>';
         }
         $('#items1').html(itemLists);
 
     }
 
-    function setItems2(){
+    function setItems2() {
         var i = itemTypesXD.selectedIndex;
         var itemLists = "";
-      //  console.log( itemTypees2);
-        for (var k = 0; k< allItems[i].itemList.length; k++)
-        {
-            itemLists +=  '<option value:"'+ allItems[i].itemList[k] + '">';
-            itemLists +=   allItems[i].itemList[k] + '</option>';
+        //  console.log( itemTypees2);
+        for (var k = 0; k < allItems[i].itemList.length; k++) {
+            itemLists += '<option value:"' + allItems[i].itemList[k] + '">';
+            itemLists += allItems[i].itemList[k] + '</option>';
         }
         $('#itemsXD').html(itemLists);
 

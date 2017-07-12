@@ -32,7 +32,7 @@
                 <div class="content-panel">
                     <div id="profile-02">
                         <div class="user">
-                            <img src="images/img1.jpg" class="img-rounded" width="200">
+                            <img src="images/pp.jpg" class="img-rounded" width="100">
                             <h3><%=user.name%></h3>
                             <h6><%=user.school%></h6>
                             <h6><%=user.phone%></h6>
@@ -47,7 +47,6 @@
             </div>
 
             <div class="row mt" id="isteklerDiv">
-
             </div>
 
 
@@ -150,14 +149,18 @@
                     isteklerDivHtml +=  '  <div class="row data">';
                     isteklerDivHtml +=  ' <div class="col-sm-6 col-xs-6 goleft">';
                     if(result[i].donationStatus == "Aktif"){
-                        isteklerDivHtml +=  ' <h6><b>'+result[i].donationCount+ '&nbspadet&nbsp' + result[i].donationRequest.item + '&nbspbağışlanacak'+'</b></h6>';
+                        isteklerDivHtml +=  ' <h5><b>'+result[i].donationCount+ '&nbspadet&nbsp' + result[i].donationRequest.item + '&nbspbağışlanacak'+'</b></h5>';
 
                     }
                     else if(result[i].donationStatus == "Tamamlandı"){
-                        isteklerDivHtml +=  ' <h6><b>'+result[i].donationCount+ '&nbspadet&nbsp' + result[i].donationRequest.item + '&nbspbağışlandı'+'</b></h6>';
+                        isteklerDivHtml +=  ' <h5><b>'+result[i].donationCount+ '&nbspadet&nbsp' + result[i].donationRequest.item + '&nbspbağışlandı'+'</b></h5>';
+                        isteklerDivHtml +=  '<form name="donationDetailForm" action="/notGoster" method="post">'
+                        isteklerDivHtml +=  '<input type="text" class="form-control" placeholder="" value="'+ result[i]._id +'" name="donationID" hidden=true   style="display: none;"  autofocus>'
+                        isteklerDivHtml +=  '<button id="submitNotGoster" class="btn- btn-info"> Temsilcinin Notu</button>'
+                        isteklerDivHtml +=  '</form>';
                     }
                     else{
-                        isteklerDivHtml +=  ' <h6><b>'+result[i].donationCount+ '&nbspadet&nbsp' + result[i].donationRequest.item + '&nbspbağışlanamadı (iptal)'+'</b></h6>';
+                        isteklerDivHtml +=  ' <h5><b>'+result[i].donationCount+ '&nbspadet&nbsp' + result[i].donationRequest.item + '&nbspbağışlanamadı (iptal)'+'</b></h5>';
                     }
                     isteklerDivHtml +=  ' <h6></h6>';
                     isteklerDivHtml +=  ' <h6></h6>';
@@ -171,17 +174,18 @@
 
                     if(result[i].donationStatus == "Aktif"){
 
+                        isteklerDivHtml +=  '<form  action="/bagisiptal" method="post">'
+                        isteklerDivHtml +=  '<input type="text" class="form-control" placeholder="" value="'+ result[i]._id +'" name="id" hidden=true   style="display: none;"  autofocus>'
+                        isteklerDivHtml +=  '<button id="submitIstekIptal" class="btn- btn-theme04" style="margin-left: 35%;"> iptal et</button>'
+                        isteklerDivHtml +=  '</form>';
+                        isteklerDivHtml +=  '<br>';
                         if(result[i].cargoInfo == ""){
                             isteklerDivHtml +=  '<div class="col-sm-5 col-xs-6">';
-                            isteklerDivHtml +=  '<button class="btn btn-theme02" data-toggle="modal" data-target="#KargoModel" ' +
+                            isteklerDivHtml +=  '<button class="btn btn-theme02" style="margin-left: 50%;" data-toggle="modal" data-target="#KargoModel" ' +
                                 ' onclick="kargoBilgileriniGir(' +JSON.stringify(result[i]._id).replace(/"/g,"&quot;") + ')"' + '> <i class="fa fa-heart"></i> Kargo Bilgilerini Gir </button>';
                             isteklerDivHtml +=  '</div>';
                         }
 
-                        isteklerDivHtml +=  '<form  action="/bagisiptal" method="post">'
-                        isteklerDivHtml +=  '<input type="text" class="form-control" placeholder="" value="'+ result[i]._id +'" name="id" hidden=true   style="display: none;"  autofocus>'
-                        isteklerDivHtml +=  '<button id="submitIstekIptal" class="btn- btn-info"> iptal et</button>'
-                        isteklerDivHtml +=  '</form>';
 
                     }
 

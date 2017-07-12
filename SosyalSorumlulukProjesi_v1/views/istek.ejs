@@ -12,8 +12,6 @@
         padding-top: 35px;
     }
 
-
-
     #comments {
         display: block;
     }
@@ -81,62 +79,140 @@
     <aside>
         <% include partials/sidebar %>
     </aside>
-    <!-- **********************************************************************************************************************************************************
-    MAIN CONTENT
-    *********************************************************************************************************************************************************** -->
     <section id="main-content">
         <section class="wrapper site-min-height">
             <h2><i></i> Bağış İstekleri </h2>
 
-            <% var proggress = (donationDetail.donatedCount / donationDetail.totalcount) * ((100 / donationDetail.totalcount) / (100 / donationDetail.totalcount)) * 100 | 0;
+            <% var proggress = (donationDetail.donatedCount + donationDetail.promisedCount / donationDetail.totalcount) * ((100 / donationDetail.totalcount) / (100 / donationDetail.totalcount)) * 100 | 0;
             console.log(proggress, "-------");
             %>
             <div class="row mt" id="isteklerDiv">
                 <div class="col-lg-12 col-md-12 col-sm-12 mb">
                     <div class="weather-2 pn">
                         <div class="weather-2-header">
+                            <div class="col-sm-12 col-xs-12" style="color:white;">
+                                <h4><%= JSON.stringify(donationDetail.description) %></h4>
+                                <h4><%= JSON.stringify(donationDetail.establishment) %>
+                                    için <%= JSON.stringify(donationDetail.totalcount - (donationDetail.donatedCount + donationDetail.promisedCount)) %>
+                                    tane <%= JSON.stringify(donationDetail.item) %> gerekiyor.</h4>
+                            </div>
                             <div class="row">
-                                <div class="col-sm-6 col-xs-6" style="color:white;">
-                                    <h3><%= JSON.stringify(donationDetail.school) %>
-                                        için <%= JSON.stringify(donationDetail.totalcount - donationDetail.donatedCount) %>
-                                        tane <%= JSON.stringify(donationDetail.item) %> gerekiyor.</h3>
-                                </div>
+
                                 <div class="col-sm-6 col-xs-6 goright">
 
                                 </div>
                             </div>
                         </div>
                         <div class="row centered">
-                            <img src="images/bagisistekornek.jpg" class="img-rounded" width="120"> </a>
+
+
                         </div>
-                        <div class="row data">
+                        <div class="row data" style="height: 100px;">
                             <div class="col-sm-6 col-xs-6 goleft">
-                                <h2>Durum: <%= donationDetail.status %></h2>
+                                <h4>Temsilci: <%=donationDetail.user%></h4>
+                                <h4>Adres: <%= JSON.stringify(donationDetail.address.city)+" "+ JSON.stringify(donationDetail.address.district)+" "+JSON.stringify(donationDetail.address.localaddress) %></h4>
+                                <h4>Durum: <%= donationDetail.status %></h4>
+                                    <h4>Bağış Sayısı: <%= donationDetail.donatedCount + donationDetail.promisedCount + '/' + donationDetail.totalcount; %></h4>
+
+
                             </div>
                             <div class="col-sm-6 col-xs-6 right">
+                                <%if(donationDetail.itemType=="giysi"){%>
+                                <img src="images/clothes.jpg" class="img-rounded" width="100"> </a>
+                                <%} else{%>
+                                <img src="images/bagisistekornek.jpg" class="img-rounded" width="150"> </a>
+                                <%} %>
 
-                                <h3><%= donationDetail.donatedCount+'/'+donationDetail.totalcount; %></h3>
                             </div>
                         </div>
 
-                        <div class="progress">
-                            <div class="progress-bar progress-bar-success" role="progressbar"
-                                 aria-valuenow="<%= donationDetail.donatedCount %>" aria-valuemin="0"
-                                 aria-valuemax="<% donationDetail.totalcount %>" style="width: '<%= proggress %>%">
-                                <% proggress %>
-                                %
-                            </div>
-                        </div>
 
+
+                    </div>
+                    <div class="progress">
+                        <div class="progress-bar progress-bar-success" role="progressbar"
+                             aria-valuenow="<%= (donationDetail.donatedCount + donationDetail.promisedCount) %>"
+                             aria-valuemin="0"
+                             aria-valuemax="<%= donationDetail.totalcount %>" style="width: '<%= proggress %>%">
+                            <%= proggress %>
+
+                        </div>
                     </div>
                 </div>
             </div>
 
+            <div>
+                <% if(madeDonations != null){ %>
+
+                <h2><i></i> Yapılan Bağışlar</h2>
+
+                <%
+                    var k;
+                for(k = 0;k < madeDonations.length;k++){
+                %>
+                <div class="row mt" id="isteklerDiv">
+                    <div class="col-lg-12 col-md-12 col-sm-12 mb">
+                        <div class="weather-2 pn">
+                            <div class="col-sm-6 col-xs-6 ">
+                                <h3><%= "Bağışçı: " + JSON.stringify(madeDonations[k].donator) %> </h3>
+                                <h3><%= "Adet: " + JSON.stringify(madeDonations[k].donationCount) %> </h3>
+
+                                <h3><%= "Kargo Şirketi: " + JSON.stringify(madeDonations[k].cargoInfo.cargoCompany) %></h3>
+                                <h3><%= "Takip Numarası: " + JSON.stringify(madeDonations[k].cargoInfo.trackingNo) %></h3>
+                                <% console.log(madeDonations[k]._id, "--------------------------");
+                                    var id = madeDonations[k]._id;
+                                    console.log(id, "--------------------------");
+                                %>
+
+                                <button name="finishDonationButton" class="btn btn-theme02" data-toggle="modal"
+                                        data-target="<%="#bagisOnayiModel"+ k%>"> Bağışı Onayla
+                                </button>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal fade" id="<%="bagisOnayiModel"+ k%>" tabindex="-1" role="dialog"
+                     aria-labelledby="<%="bagisOnayiModelLabel"+k%>" aria-hidden="true" data-backdrop="false">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;
+                                </button>
+                                <h4 class="modal-title">Bağış Onayı</h4>
+                            </div>
+                            <div id="<%="bagisOnayiModelLabel"+k%>" class="modal-body">
+                                <form id="<%="bagisOnayiForm" + k %>" name="<%="bagisOnayiForm" + k %>" action="/onaybilgisiekle" method="POST"
+                                      enctype="multipart/form-data">
+                                    <br>
+                                    <input type="text" class="form-control" placeholder="Teşekkür Açıklamanız"
+                                           name="thankyouletter" autofocus>
+                                    <br>
+                                    <input type="file" class="form-control" placeholder="Eşya Fotoğrafı" name="foto">
+                                    <br>
+                                    <input type="text" hidden="true" name="donationID" value="<%=id%>">
+
+                                    <button class="btn btn-theme btn-block" id="<%="submitButton" + k %>"><i class="fa fa-plus"></i>
+                                        Teşekkür Et
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <%
+                }
+                } %>
+            </div>
+
 
             <div id="w">
+
                 <h1>Yorumlar</h1>
 
                 <div id="container">
+                    <% if(donationDetail.comments != null){ %>
                     <ul id="comments">
                         <% for(var i = 0; i < donationDetail.comments.length; i++) { %>
 
@@ -144,21 +220,27 @@
                             <div class="avatar"><a href="javascript:void(0);">
                                     <img src="images/dark-cubes.png" width="55" height="55"
                                          alt="DarkCubes photo avatar"></a></div>
-                            <div class="cmmnt-content" id="<%="comment"+i%>">
+                            <div class="cmmnt-content" id="<%= "comment" + i %>">
                                 <header><a href="javascript:void(0);"
                                            class="userlink"><%= donationDetail.comments[i].email %></a> -
                                     <span class="pubdate"><%= donationDetail.comments[i].commentDate %></span>
                                 </header>
                                 <h5> <%= donationDetail.comments[i].comment %></h5>
                                 <% if(donationDetail.comments[i].replies == null){ %>
-                                <button id="<%="replyButton"+i %>" name="replyButton" onclick="openForm(<%="replyButton"+i %>)" class="fa-reply">Yanıtla</button>
-                                <%}%>
-                                <form id="<%="replyForm"+i%>" style="display:none;" action="/cevapEkle" method="post">
-                                    <textarea name="firstReply" id="<%="replyTextArea" + i%>" ></textarea>
-                                    <input name="donationRequestID"  hidden="true" value="<%=donationDetail._id%>"></input>
-                                    <input name="firstReplyID"  hidden="true" value="<%=i%>"></input>
+                                <button id="<%= "replyButton" + i %>" name="replyButton"
+                                        onclick="openForm(<%= "replyButton" + i %>)" class="fa-reply">Yanıtla
+                                </button>
+                                <% } %>
+                                <form id="<%= "replyForm" + i %>" style="display:none;" action="/cevapEkle"
+                                      method="post">
+                                    <textarea name="firstReply" id="<%= "replyTextArea" + i %>"></textarea>
+                                    <input name="donationRequestID" hidden="true"
+                                           value="<%= donationDetail._id %>"></input>
+                                    <input name="firstReplyID" hidden="true" value="<%= i %>"></input>
 
-                                    <button id="<%="sendReplyButton"+i %>" name="sendReplyButton"   class="fa-reply">Yanıtla</button>
+                                    <button id="<%= "sendReplyButton" + i %>" name="sendReplyButton" class="fa-reply">
+                                        Yanıtla
+                                    </button>
 
                                 </form>
 
@@ -185,15 +267,19 @@
                                 </li>
                             </ul>
 
-
                             <% } %>
-                            <button id="<%="replyToAnswerButton"+i %>" name="replyToAnswerButton" onclick="openForm(<%="replyToAnswerButton"+i %>)" class="fa-reply">Yanıtla</button>
-                            <form id="<%="replyToAnswerForm"+i%>" style="display: none;" action="/yorumEkle" method="post">
-                                <textarea name="replyToAnswer" id="<%="replyToAnswerTextArea" + i%>" ></textarea>
-                                <input name="donationRequestID"  hidden="true" value="<%=donationDetail._id%>"></input>
-                                <input name="replyToAnswerID"  hidden="true" value="<%=i%>"></input>
-                                <input name="secondReplyID"  hidden="true" value="<%=j%>"></input>
-                                <button id="<%="sendReplyButton"+i %>" name="sendReplyButton"   class="fa-reply">Yanıtla</button>
+                            <button id="<%= "replyToAnswerButton" + i %>" name="replyToAnswerButton"
+                                    onclick="openForm(<%= "replyToAnswerButton" + i %>)" class="fa-reply">Yanıtla
+                            </button>
+                            <form id="<%= "replyToAnswerForm" + i %>" style="display: none;" action="/yorumEkle"
+                                  method="post">
+                                <textarea name="replyToAnswer" id="<%= "replyToAnswerTextArea" + i %>"></textarea>
+                                <input name="donationRequestID" hidden="true" value="<%= donationDetail._id %>"></input>
+                                <input name="replyToAnswerID" hidden="true" value="<%= i %>"></input>
+                                <input name="secondReplyID" hidden="true" value="<%= j %>"></input>
+                                <button id="<%= "sendReplyButton" + i %>" name="sendReplyButton" class="fa-reply">
+                                    Yanıtla
+                                </button>
                             </form>
                             <% } %>
 
@@ -202,14 +288,15 @@
                         <% } %>
                     </ul>
                 </div>
+                <% } %>
 
-                <form id="replyToThreadForm"  action="/konuyaYorumEkle" method="post">
-                    <textarea name="replyToThread" id="replyToThreadTextArea" ></textarea>
-                    <input name="donationRequestIDReply"  hidden="true" value="<%=donationDetail._id%>"></input>
-                    <button id=sendReplyToThreadButton" name="sendReplyToThreadButton"   class="fa-reply">Yorun Ekle</button>
+                <form id="replyToThreadForm" action="/konuyaYorumEkle" method="post">
+                    <textarea name="replyToThread" id="replyToThreadTextArea"
+                              style="width:100%;height:100%;"></textarea>
+                    <input name="donationRequestIDReply" hidden="true" value="<%= donationDetail._id %>"></input>
+                    <button id=sendReplyToThreadButton" name="sendReplyToThreadButton">Yorum Ekle</button>
                 </form>
             </div>
-
 
 
         </section>
@@ -252,24 +339,22 @@
 </script>
 <script>
 
-       function openForm(id) {
+    function openForm(id) {
 
-           $(".fa-reply").click(function() {
-               this.nextElementSibling.style.display="block";
-               document.getElementById(id).style.display="none";
+        $(".fa-reply").click(function () {
+            this.nextElementSibling.style.display = "block";
+            document.getElementById(id).style.display = "none";
 //                var replyButtonToNotDisplay = document.getElementById("replyToAnswerButton");
 //                replyButtonToNotDisplay.style.display="none";
-               //  this.parentNode.appendChild(replyForm);
-               console.log($(this).parent().attr('id'));
-           });
-            console.log("hello", "----------------------------------------------");
+            //  this.parentNode.appendChild(replyForm);
+            console.log($(this).parent().attr('id'));
+        });
+        console.log("hello", "----------------------------------------------");
 
     }
 
 
-
 </script>
-
 
 
 </body>

@@ -24,6 +24,8 @@ var bagisistekleri = require('./routes/bagisistekleri');
 var bagiscibilgileri = require('./routes/bagiscibilgileri');
 var istek = require('./routes/istek');
 var haziresyalar = require('./routes/haziresyalar');
+var temsilciistekleri = require('./routes/temsilciistekleri');
+var tesekkurnotu = require('./routes/tesekkurnotu');
 
 var app = express();
 
@@ -59,6 +61,8 @@ app.use('/esyabilgileri', esyabilgileri);
 app.use('/bagiscibilgileri', bagiscibilgileri);
 app.use('/istek', istek);
 app.use('/haziresyalar', haziresyalar);
+app.use('/temsilciistekleri', temsilciistekleri);
+app.use('/tesekkurnotu', tesekkurnotu);
 
 app.post('/loginprovider', function (req, res) {
     var e_mail = req.body.email.trim();
@@ -266,7 +270,7 @@ app.post('/cevapEkle', function (req, res) {
 
         donationRequests.find({"_id": donationRequestID}, function (err, result2) {
             if (err) throw err;
-            res.render('istek', {username: req.session.email, donationDetail: result2[0]});
+            res.render('istek', {username: req.session.email, donationDetail: result2[0],userrealname: req.session.userrealname,madeDonations: null});
         });
 
 
@@ -310,7 +314,7 @@ app.post('/yorumEkle', function (req, res) {
         if (err) throw err;
         donationRequests.find({"_id": donationRequestID}, function (err, result2) {
             if (err) throw err;
-            res.render('istek', {username: req.session.email, donationDetail: result2[0]});
+            res.render('istek', {username: req.session.email, donationDetail: result2[0],userrealname: req.session.userrealname,madeDonations: null});
         });
     });
 
@@ -333,28 +337,49 @@ app.post('/konuyaYorumEkle', function (req, res, next) {
         if (err) throw err;
 
         console.log(result[0], "---------------------------------------");
-        newCommentID = Object.keys(result[0].comments).length;
-        console.log(newCommentID, "-------------------comment count------------------");
 
-        donationRequests.update({"_id": donationRequestID}, {
-            $push: {
-                'comments': {
-                    "commentID": newCommentID.toString(),
-                    "email": req.session.email,
-                    "comment": comment,
-                    "commentDate": currentTime
+        if(result[0].comments!=null) {
+            newCommentID = Object.keys(result[0].comments).length;
+            console.log(newCommentID, "-------------------comment count------------------");
+
+            donationRequests.update({"_id": donationRequestID}, {
+                $push: {
+                    'comments': {
+                        "commentID": newCommentID.toString(),
+                        "email": req.session.email,
+                        "comment": comment,
+                        "commentDate": currentTime
+                    }
                 }
-            }
-        }, function (err, result2) {
-            if (err) throw err;
-
-            donationRequests.find({"_id": donationRequestID}, function (err, result3) {
+            }, function (err, result2) {
                 if (err) throw err;
-                res.render('istek', {username: req.session.email, donationDetail: result3[0]});
+
+                donationRequests.find({"_id": donationRequestID}, function (err, result3) {
+                    if (err) throw err;
+                    res.render('istek', {username: req.session.email, donationDetail: result3[0],userrealname: req.session.userrealname,madeDonations: null});
+                });
+
             });
+        } else{
+            donationRequests.update({"_id": donationRequestID}, {
+                $push: {
+                    'comments': {
+                        "commentID": 0,
+                        "email": req.session.email,
+                        "comment": comment,
+                        "commentDate": currentTime
+                    }
+                }
+            }, {"upsert": true}, function (err, result2) {
+                if (err) throw err;
 
-        });
+                donationRequests.find({"_id": donationRequestID}, function (err, result3) {
+                    if (err) throw err;
+                    res.render('istek', {username: req.session.email, donationDetail: result3[0],userrealname: req.session.userrealname,madeDonations: null});
+                });
 
+            });
+        }
     });
 
 
@@ -423,18 +448,44 @@ app.post('/bagisisteklerinigetir', function (req, res) {
     });
 });
 
+
+app.post('/temsilciisteklerinigetir', function (req, res) {
+    var db = req.db;
+    var users =db.get('users');
+    var donationRequests = db.get('donationRequests');
+    console.log(req.session.username,"--------------------email------------------------");
+    users.find({"email": req.body.username}, function (err, result) {
+        if (err) throw err;
+        console.log(result);
+        donationRequests.find({"status": "Aktif","user":result[0].name}, function (err, result2) {
+            if (err) throw err;
+            console.log(result2);
+            res.send(result2);
+        });
+
+    });
+
+});
+
 app.post('/istekGetir', function (req, res) {
 
     var requestID = req.body.requestID;
 
     var db = req.db;
     var donationRequests = db.get('donationRequests');
+    var donations = db.get('donation');
 
     donationRequests.find({"_id": requestID}, function (err, result) {
         if (err) throw err;
 
-        console.log(requestID, "---------------------------------------")
-        res.render('istek', {username: req.session.email, donationDetail: result[0],userrealname: req.session.userrealname});
+        console.log(requestID, "---------------------------------------");
+
+        donations.find({"requestId": requestID}, function (err, result2) {
+            if (err) throw err;
+            console.log(result2, "-----------------Made Donations--------------------------");
+
+            res.render('istek', {username: req.session.email, donationDetail: result[0],userrealname: req.session.userrealname, madeDonations: result2});
+        });
     });
 });
 
@@ -443,6 +494,7 @@ app.post('/yeniBagis', function (req, res) {
     var item = req.body.item;
     console.log("-----------------------------------------------------------------", item);
     var itemCount = req.body.requestedCount;
+    var description= req.body.description;
 
     var db = req.db;
     var currentTime = new Date();
@@ -453,26 +505,34 @@ app.post('/yeniBagis', function (req, res) {
     //     if (err) throw err;
     // });
 
-    users.find({"email": req.session.email}, function (err, result) {
-        if (err) throw err;
-
-        donationRequests.insert({
-            "date": currentTime,
-            "status": "Aktif",
-            "user": req.session.email,
-            "itemType": itemType,
-            "address": result[0].address,
-            "item": item,
-            "totalcount": itemCount.toString(),
-            "donatedCount": 0,
-            "promisedCount": 0
-        }, function (err, result2) {
+    if(req.session.usertype=="temsilci") {
+        users.find({"email": req.session.email}, function (err, result) {
             if (err) throw err;
 
-            res.redirect('/mainpage');
+            donationRequests.insert({
+                "date": currentTime,
+                "status": "Aktif",
+                "user": req.session.userrealname,
+                "establishment": result[0].establishment,
+                "itemType": itemType,
+                "address": result[0].address,
+                "description": description,
+                "item": item,
+                "totalcount": parseInt(itemCount),
+                "donatedCount": 0,
+                "promisedCount": 0
+            }, function (err, result2) {
+                if (err) throw err;
+
+                res.redirect('/mainpage');
+
+            });
 
         });
-    });
+    }else {
+        res.redirect('/mainpage');
+    }
+
 });
 
 app.post('/bagisekle', function (req, res) {
@@ -499,13 +559,14 @@ app.post('/bagisekle', function (req, res) {
 
                 donationRequests.update({"_id": reqId}, {
                     $inc: {
-                        "promisedCount": result[0].promisedCount + donationCount
+                        "promisedCount": + donationCount
                     }
                 }, function (err, result4) {
                     if (err) throw err;
+
                     var notifMessage = " sizin isteğinize bir bağışta bulundu.";
                     notif.insert({
-                        "from": req.session.email, "to": result[0].user, "date": currentTime,
+                        "from": req.session.userrealname, "to": result[0].user, "date": currentTime,
                         "notificationStatus": "unseen", "message": notifMessage
                     }, function (err, result5) {
                         if (err) throw err;
@@ -601,7 +662,6 @@ app.post('/eldekiesyayiekle', function (req, res) {
     var currentTime = new Date();
     console.log("Uploading: xde");
 
-
     var img = req.files.foto;
     var filename = req.body.foto;
 
@@ -625,6 +685,74 @@ app.post('/eldekiesyayiekle', function (req, res) {
 
         res.redirect('/mainpage');
     });
+
+});
+
+app.post('/onaybilgisiekle', function (req, res) {
+    var db = req.db;
+
+    var donations = db.get('donation');
+    var donationRequests= db.get('donationRequests');
+    var currentTime = new Date();
+    var donationID = req.body.donationID;
+    var thankyouletter = req.body.thankyouletter;
+    console.log(thankyouletter, "-----------------------------------thank you letter------------------");
+
+    var img = req.files.foto;
+
+    img.mv(__dirname + '/public/images/' + img.name, function (err) {
+        if (err)
+            return res.status(500).send(err);
+
+    });
+    donations.find({"_id": req.body.donationID}, {
+        }, function (err, result2) {
+        if (err) throw err;
+
+        console.log(result2, "-----------------------------------donation------------------");
+
+        donationRequests.update({"_id":result2[0].requestId},{
+            $inc: {
+             "donatedCount": +result2[0].donationCount,
+                "promisedCount": - result2[0].donationCount
+            }}, function (err, result3) {
+            if (err) throw err;
+            console.log(result3, "------------------------------donation---request------------------");
+
+
+
+        });
+    });
+
+    donations.update({"_id": req.body.donationID}, {
+        $set: {
+            "donationStatus": "Tamamlandı",
+            "thankYouLetter": thankyouletter,
+            "thankYouImage": img.name
+
+        }},{"upsert":true}, function (err, result4) {
+        if (err) throw err;
+
+        console.log(result4, "-----------------------------------donation------------------");
+
+        res.redirect('/mainpage');
+    });
+
+});
+
+app.post('/notGoster', function (req, res) {
+
+    var donationID = req.body.donationID;
+
+    var db = req.db;
+    var donations = db.get('donation');
+
+        donations.find({"_id": donationID}, function (err, result) {
+            if (err) throw err;
+            console.log(result, "-----------------Donation--------------------------");
+
+            res.render('tesekkurnotu', {username: req.session.email, donationDetail: result[0],userrealname: req.session.userrealname});
+        });
 
 });
 
@@ -973,6 +1101,80 @@ app.get('/wsGetAllAvailableItemByID', function (req, res) {
         }
     });
 });
+
+app.get('/wsAddDonatorItem', function (req, res) {
+    var email= req.query.email;
+    var count= req.query.count;
+    var itemType= req.query.itemType;
+    var itemName= req.query.itemName;
+    var imagePath= req.query.imagePath;
+    var currentTime = new Date();
+    var db = req.db;
+    var donatorItems = db.get('donatorItems');
+    donatorItems.insert({
+        "donator": email,
+        "date": currentTime,
+        "itemStatus": "Aktif",
+        "remainingItemCount": count,
+        "count": count,
+        "itemType": itemType,
+        "itemName": itemName
+    }, function (err, result) {
+        if (err) throw err;
+
+        if (result._id != null) {
+            donatorItems.find({"_id": result._id}, function (err, result2) {
+                if (err) throw err;
+                if (result2.length > 0) {
+                    res.send(JSON.stringify(result2[0], null, 2));
+                }
+            });
+        }
+        else {
+            res.json({"_id": "null"});
+        }
+    });
+});
+
+
+
+app.get('/wsGetAllDonatorItems', function (req, res) {
+
+    var db = req.db;
+    var donatorItems = db.get('donatorItems');
+
+            donatorItems.find({}, function (err, result) {
+                if (err) throw err;
+                if (result.length > 0) {
+                    res.send(JSON.stringify(result, null, 2));
+                }
+                else {
+                    res.json({"_id": "null"});
+
+                }
+
+
+    });
+});
+
+
+app.get('/wsGetOneDonatorItem', function (req, res) {
+    var id = req.query.id;
+    var db = req.db;
+    var donatorItems = db.get('donatorItems');
+
+    donatorItems.find({"_id":id}, function (err, result) {
+        if (err) throw err;
+        if (result.length > 0) {
+            res.send(JSON.stringify(result, null, 2));
+        }
+        else {
+            res.json({"_id": "null"});
+        }
+    });
+});
+
+
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
